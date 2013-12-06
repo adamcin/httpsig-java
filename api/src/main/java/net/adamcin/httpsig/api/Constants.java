@@ -28,8 +28,11 @@
 package net.adamcin.httpsig.api;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +45,7 @@ public final class Constants {
     /**
      * Identifier for the Signature Authentication scheme
      */
-    public static final String SCHEME = "SSHKey";
+    public static final String SCHEME = "Signature";
 
     /**
      * Http response header representing a server authentication challenge
@@ -56,14 +59,26 @@ public final class Constants {
     public static final String REALM = "realm";
 
     /**
+     * Challenge header "discard" parameter
+     */
+    public static final String DISCARD = "discard";
+
+    /**
      * Parameter name for challenge-selected SSH Public Key Fingerprint
      */
-    public static final String FINGERPRINT = "keyid";
+    public static final String FINGERPRINT = "keyId";
 
     /**
      * Parameter name for challenge-provided nonce
      */
     public static final String NONCE = "nonce";
+
+
+    public static final String HEADER_REQUEST_LINE = "request-line";
+
+    public static final String HEADER_DATE = "date";
+
+    public static final List<String> DEFAULT_HEADERS = Arrays.asList(HEADER_DATE);
 
     /**
      * Http request header representing client credentials
@@ -75,6 +90,11 @@ public final class Constants {
      * Parameter name for the "token" authorization parameter
      */
     public static final String TOKEN = "token";
+
+    /**
+     * Parameter name for the "headers" authorization parameter
+     */
+    public static final String HEADERS = "headers";
 
     /**
      * Parameter name for the "signature" authorization parameter
@@ -125,6 +145,19 @@ public final class Constants {
      *
      */
     public static final Pattern RFC2617_PARAM = Pattern.compile("(^|\\s)(\\w+)=\"([^\"]*)\"");
+
+    public static final List<String> parseTokens(String tokens) {
+        if (tokens == null || tokens.trim().isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            List<String> tokenList = new ArrayList<String>();
+            String[] _tokens = tokens.trim().split("\\s+");
+            for (String _token : _tokens) {
+                tokenList.add(_token);
+            }
+            return Collections.unmodifiableList(tokenList);
+        }
+    }
 
     public static final Map<String, String> parseRFC2617(String header) {
         Map<String, String> params = new HashMap<String, String>();

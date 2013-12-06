@@ -43,24 +43,39 @@ public final class Challenge implements Serializable {
     private static final String CRLF = "\r\n";
 
     private final String realm;
+
+    @Deprecated
     private final String fingerprint;
+
+    @Deprecated
     private final String nonce;
+
+    @Deprecated
     private final String host;
+
+    @Deprecated
     private final String userAgent;
+
+    private final List<String> headers;
     private final List<Algorithm> algorithms;
+    private final String discard;
 
     public Challenge(final String realm,
                      final String fingerprint,
                      final String nonce,
                      final String host,
                      final String userAgent,
-                     final Collection<Algorithm> algorithms) {
+                     final List<String> headers,
+                     final Collection<Algorithm> algorithms,
+                     final String discard) {
         this.realm = realm;
         this.fingerprint = fingerprint;
         this.nonce = nonce;
         this.host = host != null ? host : "";
         this.userAgent = userAgent != null ? userAgent : "";
+        this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Constants.DEFAULT_HEADERS;
         this.algorithms = algorithms != null ? Arrays.asList(algorithms.toArray(new Algorithm[algorithms.size()])) : Collections.<Algorithm>emptyList();
+        this.discard = discard;
     }
 
     public String getRealm() {
@@ -83,8 +98,27 @@ public final class Challenge implements Serializable {
         return userAgent;
     }
 
+    public List<String> getHeaders() {
+        return headers;
+    }
+
     public List<Algorithm> getAlgorithms() {
         return algorithms;
+    }
+
+    public String getDiscard() {
+        return discard;
+    }
+
+    public Challenge discardKeyId(String keyId) {
+        return new Challenge(this.getRealm(),
+                                            this.getFingerprint(),
+                                            this.getNonce(),
+                                            this.getHost(),
+                                            this.getUserAgent(),
+                                            this.getHeaders(),
+                                            this.getAlgorithms(),
+                                            keyId);
     }
 
     public String getHash() {
@@ -125,31 +159,33 @@ public final class Challenge implements Serializable {
     }
 
     public static List<Algorithm> parseAlgorithms(String algorithms) {
-        if (algorithms == null || algorithms.trim().isEmpty()) {
-            return Collections.emptyList();
-        } else {
-            List<Algorithm> algorithmList = new ArrayList<Algorithm>();
-            String[] _algorithms = algorithms.trim().split("\\s+");
-            for (String _algo : _algorithms) {
-                Algorithm algorithm = Algorithm.forName(_algo);
-                if (algorithm != null) {
-                    algorithmList.add(algorithm);
-                }
+        List<String> tokens = Constants.parseTokens(algorithms);
+        List<Algorithm> algorithmList = new ArrayList<Algorithm>();
+        for (String token : tokens) {
+            Algorithm algorithm = Algorithm.forName(token);
+            if (algorithm != null) {
+                algorithmList.add(algorithm);
             }
-            return Collections.unmodifiableList(algorithmList);
         }
+        return Collections.unmodifiableList(algorithmList);
     }
 
     public static Challenge parseChallenge(final String challenge, final String host, final String userAgent) {
         Map<String, String> params = Constants.parseRFC2617(challenge);
 
-        if (params.containsKey(Constants.REALM) && params.containsKey(Constants.FINGERPRINT)
-                && params.containsKey(Constants.NONCE) && params.containsKey(Constants.ALGORITHMS)) {
+        if (params.containsKey(Constants.REALM) && params.containsKey(Constants.HEADERS)
+                && params.containsKey(Constants.ALGORITHMS)) {
+
             String realm = params.get(Constants.REALM);
             String fingerprint = params.get(Constants.FINGERPRINT);
             String nonce = params.get(Constants.NONCE);
+            String headers = params.get(Constants.HEADERS);
             String algorithms = params.get(Constants.ALGORITHMS);
-            return new Challenge(realm, fingerprint, nonce, host, userAgent, parseAlgorithms(algorithms));
+            String discard = params.get(Constants.DISCARD);
+
+            return new Challenge(realm, fingerprint, nonce, host, userAgent,
+                                 Constants.parseTokens(headers),
+                                 parseAlgorithms(algorithms), discard);
         }
 
         return null;

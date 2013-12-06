@@ -36,7 +36,7 @@ import java.util.Set;
  */
 public final class Signer {
 
-    private final Keychain keychain;
+    private Keychain keychain;
 
     public Signer() {
         this(null);
@@ -68,29 +68,39 @@ public final class Signer {
 
     /**
      * Signs a {@link Challenge} and returns an {@link Authorization} header
-     * @param challenge the challenge header to be signed
+     * @param challenge the challenge header setting the signing rules
+     * @param request the Request containing the headers to be signed
      * @return a signed SSHKey {@link Authorization} header or null if no identities could sign the {@link Challenge}
      */
-    public Authorization sign(Challenge challenge) {
+    public Authorization sign(Challenge challenge, Request request) {
         if (challenge != null) {
 
-            Key key = this.keychain.get(challenge.getFingerprint());
+            if (challenge.getDiscard() != null && !keychain.isEmpty()) {
+                if (challenge.getDiscard().equals(keychain.get().getId())) {
+                    this.keychain = keychain.discard();
+                }
+            }
 
-            if (key != null) {
+            if (!keychain.isEmpty()) {
+                Key key = this.keychain.get();
 
-                Algorithm algo = null;
-                for (Algorithm algorithm : challenge.getAlgorithms()) {
-                    if (key.getAlgorithms().contains(algorithm)) {
-                        algo = algorithm;
-                        break;
+                if (key != null) {
+
+                    Algorithm algo = null;
+                    for (Algorithm algorithm : challenge.getAlgorithms()) {
+                        if (key.getAlgorithms().contains(algorithm)) {
+                            algo = algorithm;
+                            break;
+                        }
+                    }
+
+                    byte[] signature = key.sign(algo, request.getHash(challenge.getHeaders()));
+
+                    if (signature != null) {
+                        return new Authorization(challenge.getNonce(), signature, challenge.getHeaders(), algo);
                     }
                 }
 
-                byte[] signature = key.sign(algo, challenge.getHashBytes());
-
-                if (signature != null) {
-                    return new Authorization(challenge.getNonce(), signature, algo);
-                }
             }
         }
 

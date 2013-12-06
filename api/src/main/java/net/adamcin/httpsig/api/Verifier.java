@@ -34,7 +34,7 @@ import java.util.Collection;
  */
 public final class Verifier {
 
-    private Keychain keychain;
+    private final Keychain keychain;
 
     public Verifier() {
         this(null);
@@ -54,6 +54,7 @@ public final class Verifier {
      * @param fingerprints a collection of fingerprints offered in the client request
      * @return a single preferred public key fingerprint, or null if none match
      */
+    @Deprecated
     public String select(Collection<String> fingerprints) {
         if (fingerprints != null) {
             for (String fingerprint : fingerprints) {
@@ -69,18 +70,37 @@ public final class Verifier {
      * Verifies the provided {@link Authorization} header against the original {@link Challenge}
      * @param challenge the WWW-Authenticate challenge sent to the client in the previous response
      * @param authorization the authorization header
-     * @return true if valid, false if not
+     * @return null if valid, the original challenge if not in agreement with the {@link Authorization},
+     *          or a new challenge if signature verification fails.
      */
-    public boolean verify(Challenge challenge, Authorization authorization) {
-        if (challenge == null || authorization == null) {
-            return false;
+    public Challenge verify(Challenge challenge, Request request, Authorization authorization) {
+        if (challenge == null) {
+            throw new IllegalArgumentException("challenge cannot be null");
         }
 
-        Key key = keychain.get(challenge.getFingerprint());
-        if (key.getAlgorithms().contains(authorization.getAlgorithm())) {
-            return key != null && key.verify(authorization.getAlgorithm(), challenge.getHashBytes(), authorization.getSignatureBytes());
+        if (request == null || authorization == null) {
+            return challenge;
+        }
+
+        for (String header : challenge.getHeaders()) {
+            if (!authorization.getHeaders().contains(header)) {
+                return challenge;
+            }
+        }
+
+        for (String header : authorization.getHeaders()) {
+            if (request.getHeader(header) == null) {
+                return challenge;
+            }
+        }
+
+        Key key = keychain.get(authorization.getKeyId());
+        if (key != null && key.verify(authorization.getAlgorithm(),
+                                      request.getHash(challenge.getHeaders()),
+                                      authorization.getSignatureBytes())) {
+            return null;
         } else {
-            return false;
+            return challenge.discardKeyId(authorization.getKeyId());
         }
     }
 }
