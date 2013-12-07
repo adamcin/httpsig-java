@@ -42,6 +42,12 @@ import java.util.regex.Pattern;
  */
 public final class Constants {
 
+    public static final KeyIdentifier DEFAULT_KEY_IDENTIFIER = new KeyIdentifier() {
+        public String getId(Key key) {
+            return key.getId();
+        }
+    };
+
     /**
      * Identifier for the Signature Authentication scheme
      */
@@ -66,13 +72,18 @@ public final class Constants {
     /**
      * Parameter name for challenge-selected SSH Public Key Fingerprint
      */
-    public static final String FINGERPRINT = "keyId";
+    public static final String KEY_ID = "keyId";
 
     /**
      * Parameter name for challenge-provided nonce
      */
     public static final String NONCE = "nonce";
 
+    /**
+     * The challenge headers value indicating that all request headers are required in the signature, excluding the
+     * "authorization" header itself.
+     */
+    public static final String HEADER_ALL = ":all";
 
     public static final String HEADER_REQUEST_LINE = "request-line";
 
@@ -157,6 +168,16 @@ public final class Constants {
             }
             return Collections.unmodifiableList(tokenList);
         }
+    }
+
+    public static final String constructTokensString(List<String> tokens) {
+        StringBuilder sb = new StringBuilder();
+        if (tokens != null) {
+            for (String token : tokens) {
+                sb.append(token).append(" ");
+            }
+        }
+        return sb.toString();
     }
 
     public static final Map<String, String> parseRFC2617(String header) {

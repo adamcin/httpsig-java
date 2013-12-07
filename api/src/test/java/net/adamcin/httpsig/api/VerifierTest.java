@@ -28,6 +28,7 @@
 package net.adamcin.httpsig.api;
 
 
+import net.adamcin.commons.testing.junit.TestBody;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -38,19 +39,22 @@ public class VerifierTest {
 
     @Test
     public void testVerify() {
-        String fingerprint = "fingerprint";
-        String sessionId = "sessionId";
-        String host = "localhost";
-        String userAgent = "test";
+        TestBody.test(new TestBody() {
+            @Override protected void execute() throws Exception {
+                String fingerprint = "fingerprint";
 
-        Keychain identities = new MockKeychain(fingerprint);
-        Verifier v = new Verifier(identities);
-        Challenge c = new Challenge(VerifierTest.class.getName(), fingerprint, sessionId, host, userAgent, Arrays.asList(
-                Algorithm.SSH_RSA
-        ));
-        Authorization a = new Authorization(c.getNonce(), MockKey.mockSign(c.getHashBytes()), Algorithm.SSH_RSA);
+                Keychain identities = new MockKeychain(fingerprint);
+                Verifier v = new Verifier(identities);
+                Request request = new Request();
+                request.addDateNow();
+                Challenge c = new Challenge(VerifierTest.class.getName(), Constants.DEFAULT_HEADERS, Arrays.asList( Algorithm.SSH_RSA ));
 
-        assertTrue("default verifier should verify mock signature ", v.verify(c, a));
+                byte[] content = request.getSignableContent(Constants.DEFAULT_HEADERS, Constants.CHARSET);
+                Authorization a = new Authorization(fingerprint, MockKey.mockSign(content), Constants.DEFAULT_HEADERS, Algorithm.SSH_RSA);
+
+                assertTrue("default verifier should verify mock signature ", v.verify(c, request, a) == null);
+            }
+        });
     }
 
 

@@ -3,11 +3,10 @@ package net.adamcin.httpsig.api;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -17,18 +16,49 @@ import java.util.Set;
  */
 public class DefaultKeychain implements Keychain, Collection<Key> {
 
-    private final Map<String, Key> _identities = new LinkedHashMap<String, Key>();
+    private final List<Key> keys = new ArrayList<Key>();
     private final Set<Algorithm> _algorithms = new LinkedHashSet<Algorithm>();
+    private KeyIdentifier keyIdentifier;
 
     public DefaultKeychain() {
+        this(null, null);
+    }
+
+    public DefaultKeychain(KeyIdentifier keyIdentifier) {
+        this.setKeyIdentifier(keyIdentifier);
+    }
+
+    public DefaultKeychain(KeyIdentifier keyIdentifier, Collection<? extends Key> identities) {
+        this(keyIdentifier);
+        if (identities != null) {
+            this.addAll(identities);
+        }
     }
 
     public DefaultKeychain(Collection<? extends Key> identities) {
-        this.addAll(identities);
+        this(null, identities);
     }
 
-    public Set<String> fingerprints() {
-        return Collections.unmodifiableSet(_identities.keySet());
+
+    public KeyIdentifier getKeyIdentifier() {
+        return keyIdentifier;
+    }
+
+    public void setKeyIdentifier(KeyIdentifier keyIdentifier) {
+        if (keyIdentifier != null) {
+            this.keyIdentifier = keyIdentifier;
+        } else {
+            this.keyIdentifier = Constants.DEFAULT_KEY_IDENTIFIER;
+        }
+    }
+
+
+    public Set<String> keyIds() {
+        Set<String> idSet = new HashSet<String>();
+        for (Key key : keys) {
+            idSet.add(this.keyIdentifier.getId(key));
+        }
+        return Collections.unmodifiableSet(idSet);
     }
 
     public Set<Algorithm> algorithms() {
@@ -36,44 +66,40 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
     }
 
     public int size() {
-        return _identities.size();
+        return keys.size();
     }
 
     public boolean isEmpty() {
-        return _identities.isEmpty();
+        return keys.isEmpty();
     }
 
     public boolean contains(Object o) {
-        return _identities.values().contains(o);
+        return keys.contains(o);
     }
 
     public Iterator<Key> iterator() {
-        return _identities.values().iterator();
+        return keys.iterator();
     }
 
     public Object[] toArray() {
-        return _identities.values().toArray();
+        return keys.toArray();
     }
 
     public <T> T[] toArray(T[] a) {
-        return _identities.values().toArray(a);
+        return keys.toArray(a);
     }
 
     public boolean add(Key key) {
-        if (key == null || _identities.containsKey(key.getId())) {
-            return false;
-        } else {
-            _algorithms.addAll(key.getAlgorithms());
-            return _identities.put(key.getId(), key) != null;
-        }
+        _algorithms.addAll(key.getAlgorithms());
+        return keys.add(key);
     }
 
     public boolean remove(Object o) {
-        return _identities.values().remove(o);
+        return keys.remove(o);
     }
 
     public boolean containsAll(Collection<?> c) {
-        return _identities.values().containsAll(c);
+        return keys.containsAll(c);
     }
 
     public boolean addAll(Collection<? extends Key> c) {
@@ -91,31 +117,34 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
     }
 
     public boolean removeAll(Collection<?> c) {
-        return _identities.values().removeAll(c);
+        return keys.removeAll(c);
     }
 
     public boolean retainAll(Collection<?> c) {
-        return _identities.values().retainAll(c);
+        return keys.retainAll(c);
     }
 
     public void clear() {
-        _identities.clear();
+        keys.clear();
         _algorithms.clear();
     }
 
-    public boolean contains(String fingerprint) {
-        return _identities.containsKey(fingerprint);
-    }
-
-    public Key get(String fingerprint) {
-        return _identities.get(fingerprint);
+    public Key findKey(String keyId) {
+        if (keyId != null) {
+            for (Key key : this) {
+                if (keyId.equals(keyIdentifier.getId(key))) {
+                    return key;
+                }
+            }
+        }
+        return null;
     }
 
     public Keychain discard() {
         if (isEmpty()) {
             throw new NoSuchElementException("keychain is empty");
         } else if (size() > 1) {
-            List<Key> _keys = new ArrayList<Key>(_identities.size() - 1);
+            List<Key> _keys = new ArrayList<Key>(keys.size() - 1);
             Iterator<Key> _idents = iterator();
             _idents.next();
             while (_idents.hasNext()) {
@@ -128,11 +157,25 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
         }
     }
 
-    public Key get() {
+    /**
+     *
+     * @return
+     * @throws NoSuchElementException if the keychain is empty
+     */
+    public Key currentKey() {
         if (isEmpty()) {
             throw new NoSuchElementException("keychain is empty");
         } else {
             return iterator().next();
         }
+    }
+
+    /**
+     *
+     * @return
+     * @throws NoSuchElementException if the keychain is empty
+     */
+    public String currentKeyId() {
+        return keyIdentifier.getId(currentKey());
     }
 }

@@ -27,18 +27,18 @@
 
 package net.adamcin.httpsig.api;
 
-import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * The Server-Side component of the protocol which verifies {@link Authorization} headers using SSH Public Keys
  */
 public final class Verifier {
+    public static final long DEFAULT_SKEW = 300000L;
 
     private final Keychain keychain;
-
-    public Verifier() {
-        this(null);
-    }
+    private long skew = DEFAULT_SKEW;
 
     public Verifier(Keychain keychain) {
         this.keychain = keychain != null ? keychain : new DefaultKeychain();
@@ -49,21 +49,17 @@ public final class Verifier {
     }
 
     /**
-     * Selects a public key fingerprint from those offered by the client based on what is available from the
-     * {@link Keychain}
-     * @param fingerprints a collection of fingerprints offered in the client request
-     * @return a single preferred public key fingerprint, or null if none match
+     * @return server skew in milliseconds
      */
-    @Deprecated
-    public String select(Collection<String> fingerprints) {
-        if (fingerprints != null) {
-            for (String fingerprint : fingerprints) {
-                if (Constants.validateFingerprint(fingerprint) && keychain.contains(fingerprint)) {
-                    return fingerprint;
-                }
-            }
-        }
-        return null;
+    public long getSkew() {
+        return skew;
+    }
+
+    /**
+     * @param skew new server skew in milliseconds
+     */
+    public void setSkew(long skew) {
+        this.skew = skew;
     }
 
     /**
@@ -82,21 +78,43 @@ public final class Verifier {
             return challenge;
         }
 
+        // if challenge requires :all headers, verify that all headers included in the request are declared by the authorization
+        if (challenge.getHeaders().contains(Constants.HEADER_ALL)) {
+            for (String header : request.getHeaderNames()) {
+                if (!authorization.getHeaders().contains(header)) {
+                    return challenge;
+                }
+            }
+        }
+
+        // verify that all headers required by the challenge are declared by the authorization
         for (String header : challenge.getHeaders()) {
-            if (!authorization.getHeaders().contains(header)) {
+            if (!header.startsWith(":") && !authorization.getHeaders().contains(header)) {
                 return challenge;
             }
         }
 
+        // verify that all headers declared by the authorization are present in the request
         for (String header : authorization.getHeaders()) {
-            if (request.getHeader(header) == null) {
+            if (request.getHeaderValues(header).isEmpty()) {
                 return challenge;
             }
         }
 
-        Key key = keychain.get(authorization.getKeyId());
+        // if date is declared by the authorization, verify that its value is within $skew of the current time
+        if (authorization.getHeaders().contains(Constants.HEADER_DATE) && skew >= 0) {
+            Date requestTime = request.getDateGMT();
+            Date currentTime = new GregorianCalendar(TimeZone.getTimeZone("UTC")).getTime();
+            Date past = new Date(currentTime.getTime() - skew);
+            Date future = new Date(currentTime.getTime() + skew);
+            if (requestTime.before(past) || requestTime.after(future)) {
+                return challenge;
+            }
+        }
+
+        Key key = keychain.findKey(authorization.getKeyId());
         if (key != null && key.verify(authorization.getAlgorithm(),
-                                      request.getHash(challenge.getHeaders()),
+                                      request.getSignableContent(authorization.getHeaders(), Constants.CHARSET),
                                       authorization.getSignatureBytes())) {
             return null;
         } else {

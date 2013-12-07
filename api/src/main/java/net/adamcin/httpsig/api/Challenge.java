@@ -40,39 +40,23 @@ import java.util.Map;
  * Representation of the "WWW-Authenticate: Signature ..." authentication challenge header sent by the server.
  */
 public final class Challenge implements Serializable {
-    private static final String CRLF = "\r\n";
 
     private final String realm;
-
-    @Deprecated
-    private final String fingerprint;
-
-    @Deprecated
-    private final String nonce;
-
-    @Deprecated
-    private final String host;
-
-    @Deprecated
-    private final String userAgent;
-
     private final List<String> headers;
     private final List<Algorithm> algorithms;
     private final String discard;
 
     public Challenge(final String realm,
-                     final String fingerprint,
-                     final String nonce,
-                     final String host,
-                     final String userAgent,
+                     final List<String> headers,
+                     final Collection<Algorithm> algorithms) {
+        this(realm, headers, algorithms, null);
+    }
+
+    public Challenge(final String realm,
                      final List<String> headers,
                      final Collection<Algorithm> algorithms,
                      final String discard) {
         this.realm = realm;
-        this.fingerprint = fingerprint;
-        this.nonce = nonce;
-        this.host = host != null ? host : "";
-        this.userAgent = userAgent != null ? userAgent : "";
         this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Constants.DEFAULT_HEADERS;
         this.algorithms = algorithms != null ? Arrays.asList(algorithms.toArray(new Algorithm[algorithms.size()])) : Collections.<Algorithm>emptyList();
         this.discard = discard;
@@ -80,22 +64,6 @@ public final class Challenge implements Serializable {
 
     public String getRealm() {
         return realm;
-    }
-
-    public String getFingerprint() {
-        return fingerprint;
-    }
-
-    public String getNonce() {
-        return nonce;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public String getUserAgent() {
-        return userAgent;
     }
 
     public List<String> getHeaders() {
@@ -111,33 +79,17 @@ public final class Challenge implements Serializable {
     }
 
     public Challenge discardKeyId(String keyId) {
-        return new Challenge(this.getRealm(),
-                                            this.getFingerprint(),
-                                            this.getNonce(),
-                                            this.getHost(),
-                                            this.getUserAgent(),
-                                            this.getHeaders(),
-                                            this.getAlgorithms(),
-                                            keyId);
-    }
-
-    public String getHash() {
-        return new StringBuilder(host).append(CRLF)
-                .append(realm).append(CRLF)
-                .append(nonce).append(CRLF)
-                .append(userAgent).toString();
-    }
-
-    public byte[] getHashBytes() {
-        return getHash().getBytes(Constants.CHARSET);
+        return new Challenge(this.getRealm(), this.getHeaders(), this.getAlgorithms(), keyId);
     }
 
     public String getHeaderValue() {
         Map<String, String> params = new LinkedHashMap<String, String>();
         params.put(Constants.REALM, this.realm);
-        params.put(Constants.FINGERPRINT, this.fingerprint);
-        params.put(Constants.NONCE, this.nonce);
+        params.put(Constants.HEADERS, Constants.constructTokensString(getHeaders()));
         params.put(Constants.ALGORITHMS, this.getAlgorithmsString());
+        if (this.discard != null) {
+            params.put(Constants.DISCARD, this.discard);
+        }
         return Constants.constructRFC2617(params);
     }
 
@@ -173,19 +125,16 @@ public final class Challenge implements Serializable {
     public static Challenge parseChallenge(final String challenge, final String host, final String userAgent) {
         Map<String, String> params = Constants.parseRFC2617(challenge);
 
-        if (params.containsKey(Constants.REALM) && params.containsKey(Constants.HEADERS)
+        if (params.containsKey(Constants.REALM)
+                && params.containsKey(Constants.HEADERS)
                 && params.containsKey(Constants.ALGORITHMS)) {
 
             String realm = params.get(Constants.REALM);
-            String fingerprint = params.get(Constants.FINGERPRINT);
-            String nonce = params.get(Constants.NONCE);
             String headers = params.get(Constants.HEADERS);
             String algorithms = params.get(Constants.ALGORITHMS);
             String discard = params.get(Constants.DISCARD);
 
-            return new Challenge(realm, fingerprint, nonce, host, userAgent,
-                                 Constants.parseTokens(headers),
-                                 parseAlgorithms(algorithms), discard);
+            return new Challenge(realm, Constants.parseTokens(headers), parseAlgorithms(algorithms), discard);
         }
 
         return null;

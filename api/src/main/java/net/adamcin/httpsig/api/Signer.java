@@ -27,8 +27,11 @@
 
 package net.adamcin.httpsig.api;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,22 +54,6 @@ public final class Signer {
     }
 
     /**
-     * @return a set of public key fingerprints to offer in client HTTP request
-     */
-    public Set<String> getFingerprints() {
-        Set<String> fingerprints = new HashSet<String>();
-        Set<String> _fingerprints = this.keychain.fingerprints();
-        if (_fingerprints != null) {
-            for (String fingerprint : _fingerprints) {
-                if (Constants.validateFingerprint(fingerprint)) {
-                    fingerprints.add(fingerprint);
-                }
-            }
-        }
-        return Collections.unmodifiableSet(fingerprints);
-    }
-
-    /**
      * Signs a {@link Challenge} and returns an {@link Authorization} header
      * @param challenge the challenge header setting the signing rules
      * @param request the Request containing the headers to be signed
@@ -76,13 +63,13 @@ public final class Signer {
         if (challenge != null) {
 
             if (challenge.getDiscard() != null && !keychain.isEmpty()) {
-                if (challenge.getDiscard().equals(keychain.get().getId())) {
+                if (challenge.getDiscard().equals(keychain.currentKeyId())) {
                     this.keychain = keychain.discard();
                 }
             }
 
             if (!keychain.isEmpty()) {
-                Key key = this.keychain.get();
+                Key key = this.keychain.currentKey();
 
                 if (key != null) {
 
@@ -94,10 +81,20 @@ public final class Signer {
                         }
                     }
 
-                    byte[] signature = key.sign(algo, request.getHash(challenge.getHeaders()));
+                    Set<String> signHeaders = new LinkedHashSet<String>();
+                    signHeaders.addAll(challenge.getHeaders());
+
+                    if (signHeaders.contains(Constants.HEADER_ALL)) {
+                        signHeaders.remove(Constants.HEADER_ALL);
+                        signHeaders.addAll(request.getHeaderNames());
+                    }
+
+                    List<String> headers = new ArrayList<String>(signHeaders);
+
+                    byte[] signature = key.sign(algo, request.getSignableContent(headers, Constants.CHARSET));
 
                     if (signature != null) {
-                        return new Authorization(challenge.getNonce(), signature, challenge.getHeaders(), algo);
+                        return new Authorization(this.keychain.currentKeyId(), signature, headers, algo);
                     }
                 }
 

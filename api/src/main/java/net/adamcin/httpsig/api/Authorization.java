@@ -39,32 +39,23 @@ import java.util.Map;
  */
 public final class Authorization implements Serializable {
 
-    @Deprecated
-    private final String token;
-
     private final String keyId;
     private final String signature;
     private final List<String> headers;
     private final Algorithm algorithm;
 
-    public Authorization(final String token, final String keyId, final String signature, final List<String> headers, final Algorithm algorithm) {
-        this.token = token;
+    public Authorization(final String keyId, final String signature, final List<String> headers, final Algorithm algorithm) {
         this.keyId = keyId;
         this.signature = signature;
         this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Collections.<String>emptyList();
         this.algorithm = algorithm;
     }
 
-    public Authorization(String token, final String keyId, byte[] signatureBytes, final List<String> headers, final Algorithm algorithm) {
-        this.token = token;
+    public Authorization(final String keyId, byte[] signatureBytes, final List<String> headers, final Algorithm algorithm) {
         this.keyId = keyId;
         this.signature = Base64.toBase64String(signatureBytes);
         this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Collections.<String>emptyList();
         this.algorithm = algorithm;
-    }
-
-    public String getToken() {
-        return token;
     }
 
     public String getKeyId() {
@@ -95,9 +86,9 @@ public final class Authorization implements Serializable {
 
     public String getHeaderValue() {
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(Constants.TOKEN, token);
-        params.put(Constants.FINGERPRINT, keyId);
+        params.put(Constants.KEY_ID, keyId);
         params.put(Constants.SIGNATURE, signature);
+        params.put(Constants.HEADERS, Constants.constructTokensString(getHeaders()));
         params.put(Constants.ALGORITHM, algorithm.getName());
         return Constants.constructRFC2617(params);
     }
@@ -114,16 +105,17 @@ public final class Authorization implements Serializable {
 
         Map<String, String> params = Constants.parseRFC2617(header);
 
-        if (params.containsKey(Constants.FINGERPRINT) && params.containsKey(Constants.HEADERS) && params.containsKey(Constants.SIGNATURE)
+        if (params.containsKey(Constants.KEY_ID)
+                && params.containsKey(Constants.HEADERS)
+                && params.containsKey(Constants.SIGNATURE)
                 && params.containsKey(Constants.ALGORITHM)) {
 
-            String token = params.get(Constants.TOKEN);
-            String keyId = params.get(Constants.FINGERPRINT);
+            String keyId = params.get(Constants.KEY_ID);
             String signature = params.get(Constants.SIGNATURE);
             String headers = params.get(Constants.HEADERS);
             String algorithm = params.get(Constants.ALGORITHM);
 
-            return new Authorization(token, keyId, signature, Constants.parseTokens(headers), Algorithm.forName(algorithm));
+            return new Authorization(keyId, signature, Constants.parseTokens(headers), Algorithm.forName(algorithm));
         } else {
             return null;
         }

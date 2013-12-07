@@ -31,7 +31,7 @@ public final class Http3SSHKeyAuthScheme extends RFC2617Scheme {
     public String authenticate(Credentials credentials, HttpMethod method) throws AuthenticationException {
         if (credentials instanceof SignerCredentials) {
             SignerCredentials creds = (SignerCredentials) credentials;
-            String fingerprint = this.getParameter(Constants.FINGERPRINT);
+            String fingerprint = this.getParameter(Constants.KEY_ID);
             String sessionId = this.getParameter(Constants.NONCE);
             String algorithms = this.getParameter(Constants.ALGORITHMS);
 

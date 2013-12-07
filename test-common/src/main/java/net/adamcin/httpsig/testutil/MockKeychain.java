@@ -29,14 +29,14 @@ public class MockKeychain implements Keychain {
         return mockIdentity.fingerprint.equals(fingerprint);
     }
 
-    public Key get(String fingerprint) {
+    public Key findKey(String fingerprint) {
         if (contains(fingerprint)) {
             return mockIdentity;
         }
         return null;
     }
 
-    public Set<String> fingerprints() {
+    public Set<String> keyIds() {
         return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(mockIdentity.getId())));
     }
 
@@ -48,7 +48,7 @@ public class MockKeychain implements Keychain {
         return new DefaultKeychain();
     }
 
-    public Key get() {
+    public Key currentKey() {
         return this.mockIdentity;
     }
 

@@ -53,7 +53,7 @@ public class JschIdentityTest {
         final String id = "[" + parentName + "/" + keyName + "] ";
 
         Verifier dverifier = AuthorizedKeys.newVerifier(KeyTestUtil.getPublicKeyAsFile(parentName, keyName));
-        String fingerprint = dverifier.getKeychain().fingerprints().iterator().next();
+        String fingerprint = dverifier.getKeychain().keyIds().iterator().next();
 
         Challenge challenge = challengeBuilder.build(fingerprint, format.getSignatureAlgorithms());
 
@@ -63,8 +63,8 @@ public class JschIdentityTest {
 
         Keychain sprovider = JschKey.getIdentities(jSchSigner);
 
-        assertEquals(id + "sprovider should contain only one identity", 1, sprovider.fingerprints().size());
-        assertEquals(id + "fingerprints should match", fingerprint, sprovider.fingerprints().iterator().next());
+        assertEquals(id + "sprovider should contain only one identity", 1, sprovider.keyIds().size());
+        assertEquals(id + "fingerprints should match", fingerprint, sprovider.keyIds().iterator().next());
 
         Signer jsigner = new Signer(sprovider);
         Verifier jverifier = new Verifier(sprovider);

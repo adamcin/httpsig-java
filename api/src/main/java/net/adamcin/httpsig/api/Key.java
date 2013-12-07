@@ -32,8 +32,7 @@ import java.util.Set;
 public interface Key {
 
     /**
-     * A {@link Key} is identified by its fingerprint
-     * @return the key's fingerprint
+     * @return the {@link Key}'s self-identification. This may end up not being unique within a keychain.
      */
     String getId();
 
@@ -45,17 +44,17 @@ public interface Key {
     /**
      * Verifies the {@code signatureBytes} against the {@code challengeHash} using an underlying public key
      * @param algorithm the selected Signature {@link Algorithm}
-     * @param challengeHash the result of {@link net.adamcin.httpsig.api.Challenge#getHashBytes()}
+     * @param contentBytes the result of {@link net.adamcin.httpsig.api.Request#getSignableContent(java.util.List, java.nio.charset.Charset)}
      * @param signatureBytes the result of {@link net.adamcin.httpsig.api.Authorization#getSignatureBytes()}
      * @return true if signature is valid
      */
-    boolean verify(Algorithm algorithm, byte[] challengeHash, byte[] signatureBytes);
+    boolean verify(Algorithm algorithm, byte[] contentBytes, byte[] signatureBytes);
 
     /**
      * Signs the {@code challengeHash} using the specified signature {@link Algorithm}
      * @param algorithm the selected Signature {@link Algorithm}
-     * @param challengeHash the result of {@link net.adamcin.httpsig.api.Challenge#getHashBytes()}
+     * @param contentBytes the result of {@link net.adamcin.httpsig.api.Request#getSignableContent(java.util.List, java.nio.charset.Charset)}
      * @return byte array containing the challengeHash signature or null if a signature could not be generated.
      */
-    byte[] sign(Algorithm algorithm, byte[] challengeHash);
+    byte[] sign(Algorithm algorithm, byte[] contentBytes);
 }

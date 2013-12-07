@@ -32,8 +32,8 @@ public final class Http4SSHKeyAuthScheme extends RFC2617Scheme {
         if (credentials instanceof SignerCredentials) {
             Signer signer = ((SignerCredentials) credentials).getSigner();
             System.out.println("parameters="+ this.getParameters().toString());
-            System.out.println("keyId="+ this.getParameter(Constants.FINGERPRINT));
-            String fingerprint = this.getParameter(Constants.FINGERPRINT);
+            System.out.println("keyId="+ this.getParameter(Constants.KEY_ID));
+            String fingerprint = this.getParameter(Constants.KEY_ID);
             String nonce = this.getParameter(Constants.NONCE);
             String algorithms = this.getParameter(Constants.ALGORITHMS);
 

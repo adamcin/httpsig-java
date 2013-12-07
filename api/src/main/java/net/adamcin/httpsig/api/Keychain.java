@@ -3,27 +3,20 @@ package net.adamcin.httpsig.api;
 import java.util.Set;
 
 /**
- * Self-reducing set of {@link Key}s
+ * Self-reducing list of {@link Key}s, searchable by keyId
  */
 public interface Keychain {
 
     /**
-     * Returns true if this repository contains an {@link Key} with the given fingerprint
-     * @param fingerprint
-     * @return
-     */
-    boolean contains(String fingerprint);
-
-    /**
-     * @param fingerprint a public key fingerprint
+     * @param keyId a public key fingerprint
      * @return an {@link Key} where {@code getId().equals(fingerprint)} or null if none exists
      */
-    Key get(String fingerprint);
+    Key findKey(String keyId);
 
     /**
-     * @return a set containing each {@link Key}'s fingerprint
+     * @return a set containing the keyIds of all the {@link Key}s in this {@link Keychain}
      */
-    Set<String> fingerprints();
+    Set<String> keyIds();
 
     /**
      * @return a {@link Set} containing the union of all algorithms supported by each {@link Key} in this {@link Keychain}
@@ -38,11 +31,15 @@ public interface Keychain {
     /**
      * @return a reference to the current {@link Key}.
      */
-    Key get();
+    Key currentKey();
 
     /**
-     *
-     * @return
+     * @return a the current {@link Key}'s keyId.
+     */
+    String currentKeyId();
+
+    /**
+     * @return true if this {@link Keychain} has no more keys
      */
     boolean isEmpty();
 }
