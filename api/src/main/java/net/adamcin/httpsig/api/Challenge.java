@@ -44,22 +44,13 @@ public final class Challenge implements Serializable {
     private final String realm;
     private final List<String> headers;
     private final List<Algorithm> algorithms;
-    private final String discard;
 
     public Challenge(final String realm,
                      final List<String> headers,
                      final Collection<Algorithm> algorithms) {
-        this(realm, headers, algorithms, null);
-    }
-
-    public Challenge(final String realm,
-                     final List<String> headers,
-                     final Collection<Algorithm> algorithms,
-                     final String discard) {
         this.realm = realm;
         this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Constants.DEFAULT_HEADERS;
         this.algorithms = algorithms != null ? Arrays.asList(algorithms.toArray(new Algorithm[algorithms.size()])) : Collections.<Algorithm>emptyList();
-        this.discard = discard;
     }
 
     public String getRealm() {
@@ -74,22 +65,11 @@ public final class Challenge implements Serializable {
         return algorithms;
     }
 
-    public String getDiscard() {
-        return discard;
-    }
-
-    public Challenge discardKeyId(String keyId) {
-        return new Challenge(this.getRealm(), this.getHeaders(), this.getAlgorithms(), keyId);
-    }
-
     public String getHeaderValue() {
         Map<String, String> params = new LinkedHashMap<String, String>();
         params.put(Constants.REALM, this.realm);
         params.put(Constants.HEADERS, Constants.constructTokensString(getHeaders()));
         params.put(Constants.ALGORITHMS, this.getAlgorithmsString());
-        if (this.discard != null) {
-            params.put(Constants.DISCARD, this.discard);
-        }
         return Constants.constructRFC2617(params);
     }
 
@@ -122,7 +102,7 @@ public final class Challenge implements Serializable {
         return Collections.unmodifiableList(algorithmList);
     }
 
-    public static Challenge parseChallenge(final String challenge, final String host, final String userAgent) {
+    public static Challenge parseChallenge(final String challenge) {
         Map<String, String> params = Constants.parseRFC2617(challenge);
 
         if (params.containsKey(Constants.REALM)
@@ -132,11 +112,42 @@ public final class Challenge implements Serializable {
             String realm = params.get(Constants.REALM);
             String headers = params.get(Constants.HEADERS);
             String algorithms = params.get(Constants.ALGORITHMS);
-            String discard = params.get(Constants.DISCARD);
 
-            return new Challenge(realm, Constants.parseTokens(headers), parseAlgorithms(algorithms), discard);
+            return new Challenge(realm, Constants.parseTokens(headers), parseAlgorithms(algorithms));
         }
 
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Challenge challenge = (Challenge) o;
+
+        if (!algorithms.equals(challenge.algorithms)) {
+            return false;
+        }
+        if (!headers.equals(challenge.headers)) {
+            return false;
+        }
+        if (!realm.equals(challenge.realm)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = realm.hashCode();
+        result = 31 * result + headers.hashCode();
+        result = 31 * result + algorithms.hashCode();
+        return result;
     }
 }

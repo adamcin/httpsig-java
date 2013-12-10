@@ -2,6 +2,7 @@ package net.adamcin.httpsig.jce;
 
 import net.adamcin.httpsig.api.Base64;
 import net.adamcin.httpsig.api.Key;
+import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.Verifier;
 import net.adamcin.httpsig.api.DefaultKeychain;
 import org.slf4j.Logger;
@@ -43,11 +44,11 @@ public final class AuthorizedKeys {
     private static final Charset ASCII = Charset.forName("US-ASCII");
 
     /**
-     * @return a Verifier attached to the authorized_keys identities read from
+     * @return a {@link Keychain} attached to the authorized_keys identities read from
      * @throws IOException if the default authorized_Keys file does not exist.
      */
-    public static Verifier defaultVerifier() throws IOException {
-        return newVerifier(new File(new File(System.getProperty("user.home", "/")), DEFAULT_PATH));
+    public static Keychain defaultKeychain() throws IOException {
+        return newKeychain(new File(new File(System.getProperty("user.home", "/")), DEFAULT_PATH));
     }
 
     /**
@@ -55,14 +56,14 @@ public final class AuthorizedKeys {
      *
      * @param authorizedKeysFile File in the RFC4253 authorized_keys format that every Linux admin knows and loves,
      *                           which contains a list of public keys which are allowed for authentication
-     * @return a Verifier attached to the authorized_keys identities
+     * @return a {@link Keychain} attached to the authorized_keys identities
      */
-    public static Verifier newVerifier(File authorizedKeysFile) throws IOException {
+    public static Keychain newKeychain(File authorizedKeysFile) throws IOException {
         DefaultKeychain identities = new DefaultKeychain();
         for (AuthorizedKey authorizedKey : parseAuthorizedKeys(authorizedKeysFile)) {
             identities.add(getAuthorizedKeyIdentity(authorizedKey));
         }
-        return new Verifier(identities);
+        return identities;
     }
 
     static List<AuthorizedKey> parseAuthorizedKeys(File authorizedKeys) throws IOException {

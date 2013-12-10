@@ -1,16 +1,15 @@
 package net.adamcin.httpsig.api;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: madamcin
- * Date: 11/18/13
- * Time: 5:47 PM
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class MockKeychain implements Keychain {
 
@@ -27,11 +26,11 @@ public class MockKeychain implements Keychain {
         return null;
     }
 
-    public Set<String> keyIds() {
+    public Set<String> getKeyIds() {
         return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(mockIdentity.getId())));
     }
 
-    public Set<Algorithm> algorithms() {
+    public Set<Algorithm> getAlgorithms() {
         return mockIdentity != null ? mockIdentity.getAlgorithms() : Collections.<Algorithm>emptySet();
     }
 
@@ -43,11 +42,21 @@ public class MockKeychain implements Keychain {
         return this.mockIdentity;
     }
 
-    public String currentKeyId() {
-        return this.mockIdentity.getId();
-    }
-
     public boolean isEmpty() {
         return this.mockIdentity != null;
+    }
+
+    public Keychain filterAlgorithms(Collection<Algorithm> algorithms) {
+        throw new UnsupportedOperationException("filterAlgorithms not implemented");
+    }
+
+    public Map<String, Key> toMap(KeyIdentifier keyIdentifier) {
+        return Collections.<String, Key>singletonMap(keyIdentifier != null ?
+                                                             keyIdentifier.getId(this.mockIdentity) : this.mockIdentity.getId(),
+                                                     this.mockIdentity);
+    }
+
+    public Iterator<Key> iterator() {
+        return Collections.<Key>singletonList(mockIdentity).iterator();
     }
 }

@@ -34,9 +34,9 @@ import com.jcraft.jsch.Signature;
 import com.jcraft.jsch.jce.SignatureDSA;
 import com.jcraft.jsch.jce.SignatureRSA;
 import net.adamcin.httpsig.api.Algorithm;
-import net.adamcin.httpsig.api.Key;
 import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.DefaultKeychain;
+import net.adamcin.httpsig.jce.FingerprintableKey;
 import net.adamcin.httpsig.jce.Magic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ import java.util.Vector;
 /**
  *
  */
-public class JschKey implements Key {
+public class JschKey implements FingerprintableKey {
     private static final Logger LOGGER = LoggerFactory.getLogger(JschKey.class);
 
     private final String fingerprint;
@@ -68,6 +68,10 @@ public class JschKey implements Key {
         return this.fingerprint;
     }
 
+    public String getFingerprint() {
+        return this.fingerprint;
+    }
+
     public Set<Algorithm> getAlgorithms() {
         return Collections.unmodifiableSet(this.algorithm == null ? new HashSet<Algorithm>() : new HashSet<Algorithm>(Arrays.asList(this.algorithm)));
     }
@@ -75,7 +79,7 @@ public class JschKey implements Key {
     /**
      * {@inheritDoc}
      * @param algorithm the selected Signature {@link Algorithm}
-     * @param challengeHash the result of {@link net.adamcin.httpsig.api.Challenge#getHashBytes()}
+     * @param challengeHash the result of {@link net.adamcin.httpsig.api.SignatureBuilder#buildContent(java.util.List, java.nio.charset.Charset)}
      * @param signatureBytes the result of {@link net.adamcin.httpsig.api.Authorization#getSignatureBytes()}
      * @return
      */
@@ -127,7 +131,7 @@ public class JschKey implements Key {
     /**
      * {@inheritDoc}
      * @param algorithm the selected Signature {@link Algorithm}
-     * @param challengeHash the result of {@link net.adamcin.httpsig.api.Challenge#getHashBytes()}
+     * @param challengeHash the result of {@link net.adamcin.httpsig.api.SignatureBuilder#buildContent(java.util.List, java.nio.charset.Charset)}
      * @return
      */
     public byte[] sign(Algorithm algorithm, byte[] challengeHash) {

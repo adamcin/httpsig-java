@@ -44,7 +44,7 @@ public interface Key {
     /**
      * Verifies the {@code signatureBytes} against the {@code challengeHash} using an underlying public key
      * @param algorithm the selected Signature {@link Algorithm}
-     * @param contentBytes the result of {@link net.adamcin.httpsig.api.Request#getSignableContent(java.util.List, java.nio.charset.Charset)}
+     * @param contentBytes the result of {@link SignatureBuilder#buildContent(java.util.List, java.nio.charset.Charset)}
      * @param signatureBytes the result of {@link net.adamcin.httpsig.api.Authorization#getSignatureBytes()}
      * @return true if signature is valid
      */
@@ -53,7 +53,7 @@ public interface Key {
     /**
      * Signs the {@code challengeHash} using the specified signature {@link Algorithm}
      * @param algorithm the selected Signature {@link Algorithm}
-     * @param contentBytes the result of {@link net.adamcin.httpsig.api.Request#getSignableContent(java.util.List, java.nio.charset.Charset)}
+     * @param contentBytes the result of {@link SignatureBuilder#buildContent(java.util.List, java.nio.charset.Charset)}
      * @return byte array containing the challengeHash signature or null if a signature could not be generated.
      */
     byte[] sign(Algorithm algorithm, byte[] contentBytes);

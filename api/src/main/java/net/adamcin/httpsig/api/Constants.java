@@ -30,6 +30,7 @@ package net.adamcin.httpsig.api;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,12 +42,6 @@ import java.util.regex.Pattern;
  * Constant values used by the SSHKey Specification
  */
 public final class Constants {
-
-    public static final KeyIdentifier DEFAULT_KEY_IDENTIFIER = new KeyIdentifier() {
-        public String getId(Key key) {
-            return key.getId();
-        }
-    };
 
     /**
      * Identifier for the Signature Authentication scheme
@@ -65,19 +60,9 @@ public final class Constants {
     public static final String REALM = "realm";
 
     /**
-     * Challenge header "discard" parameter
-     */
-    public static final String DISCARD = "discard";
-
-    /**
      * Parameter name for challenge-selected SSH Public Key Fingerprint
      */
     public static final String KEY_ID = "keyId";
-
-    /**
-     * Parameter name for challenge-provided nonce
-     */
-    public static final String NONCE = "nonce";
 
     /**
      * The challenge headers value indicating that all request headers are required in the signature, excluding the
@@ -98,11 +83,6 @@ public final class Constants {
     public static final String AUTHORIZATION = "Authorization";
 
     /**
-     * Parameter name for the "token" authorization parameter
-     */
-    public static final String TOKEN = "token";
-
-    /**
      * Parameter name for the "headers" authorization parameter
      */
     public static final String HEADERS = "headers";
@@ -111,16 +91,6 @@ public final class Constants {
      * Parameter name for the "signature" authorization parameter
      */
     public static final String SIGNATURE = "signature";
-
-    /**
-     * Http Host header
-     */
-    public static final String HOST = "Host";
-
-    /**
-     * Http User-Agent header
-     */
-    public static final String USER_AGENT = "User-Agent";
 
     /**
      * Challenge header "algorithms" parameter
@@ -133,24 +103,9 @@ public final class Constants {
     public static final String ALGORITHM = "algorithm";
 
     /**
-     * SSHKey Login ID header
-     */
-    public static final String SSHKEY_LOGIN_ID = "X-SSHKey-LoginId";
-
-    /**
-     * SSHKey Public Key fingerprint header
-     */
-    public static final String SSHKEY_FINGERPRINT = "X-SSHKey-Fingerprint";
-
-    /**
-     *
+     * Default encoding for header values.
      */
     public static final Charset CHARSET = Charset.forName("ISO-8859-1");
-
-    /**
-     *
-     */
-    public static final Charset CHARSET_LOGIN_ID = Charset.forName("UTF-8");
 
     /**
      *
@@ -200,41 +155,15 @@ public final class Constants {
         return sb.toString();
     }
 
-    /**
-     * Checks the provided fingerprint for lexical conformance
-     * @param fingerprint a generated public key fingerprint
-     * @return true if valid or false if the fingerprint fails nullness, emptiness, or white-space checks
-     */
-    public static boolean validateFingerprint(final String fingerprint) {
-        if (fingerprint == null) {
-            return false;
-        } else if (fingerprint.isEmpty()) {
-            return false;
-        } else if (fingerprint.matches("^[^\\s*]\\s+.*$")) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+    public static final KeyIdentifier DEFAULT_KEY_IDENTIFIER = new KeyIdentifier() {
+        public String getId(Key key) { return key.getId(); }
+    };
+
+    public static final Collection<Algorithm> ALL_SUPPORTED_ALGORITHMS = Arrays.asList(Algorithm.values());
+
+    public static final Challenge PREEMPTIVE_CHALLENGE = new Challenge("<preemptive>", DEFAULT_HEADERS, ALL_SUPPORTED_ALGORITHMS);
 
     private Constants() {
     }
 
-    /**
-     *
-     * @param loginId
-     * @return
-     */
-    public static String encodeLoginId(String loginId) {
-        return Base64.toBase64String(loginId.getBytes(CHARSET_LOGIN_ID));
-    }
-
-    /**
-     *
-     * @param encodedLoginId
-     * @return
-     */
-    public static String decodeLoginId(String encodedLoginId) {
-        return new String(Base64.fromBase64String(encodedLoginId), CHARSET_LOGIN_ID);
-    }
 }

@@ -55,6 +55,10 @@ public class MockKey implements Key {
         return new StringBuilder(new String(challengeHash, Constants.CHARSET)).reverse().toString().getBytes(Constants.CHARSET);
     }
 
+    public static String mockSignBase64(byte[] challengeHash) {
+        return Base64.toBase64String(mockSign(challengeHash));
+    }
+
     public Set<Algorithm> getAlgorithms() {
         return new HashSet<Algorithm>(Arrays.asList(Algorithm.values()));
     }

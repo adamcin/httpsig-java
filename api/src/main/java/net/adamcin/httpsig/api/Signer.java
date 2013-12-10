@@ -28,76 +28,109 @@
 package net.adamcin.httpsig.api;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Instance of a Signer, used by an HTTP client to sign a {@link Challenge} and create an {@link Authorization}
+ * Instance of a Signer, used by an HTTP client to sign a {@link SignatureBuilder} and create an {@link Authorization}
  */
 public final class Signer {
 
+    private KeyIdentifier keyIdentifier;
     private Keychain keychain;
+    private Keychain candidateKeys;
+    private Challenge challenge = Constants.PREEMPTIVE_CHALLENGE;
 
     public Signer() {
-        this(null);
+        this(null, null);
     }
 
     public Signer(Keychain keychain) {
+        this(keychain, null);
+    }
+
+    public Signer(Keychain keychain, KeyIdentifier keyIdentifier) {
         this.keychain = keychain != null ? keychain : new DefaultKeychain();
+        this.keyIdentifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
+        this.candidateKeys = this.keychain.filterAlgorithms(challenge.getAlgorithms());
     }
 
     public Keychain getKeychain() {
         return keychain;
     }
 
-    /**
-     * Signs a {@link Challenge} and returns an {@link Authorization} header
-     * @param challenge the challenge header setting the signing rules
-     * @param request the Request containing the headers to be signed
-     * @return a signed SSHKey {@link Authorization} header or null if no identities could sign the {@link Challenge}
-     */
-    public Authorization sign(Challenge challenge, Request request) {
-        if (challenge != null) {
+    public KeyIdentifier getKeyIdentifier() {
+        return keyIdentifier;
+    }
 
-            if (challenge.getDiscard() != null && !keychain.isEmpty()) {
-                if (challenge.getDiscard().equals(keychain.currentKeyId())) {
-                    this.keychain = keychain.discard();
+    /**
+     * Call this method to rotate the candidate keys
+     * @param nextChallenge the {@link Challenge} header which was returned for the previous failed request.
+     * @return true if there is at least one key left after rotation, false otherwise
+     */
+    public synchronized boolean rotateKeys(Challenge nextChallenge) {
+        return rotateKeys(nextChallenge, null);
+    }
+
+    /**
+     * Call this method to rotate the candidate keys
+     * @param nextChallenge the {@link Challenge} header which was returned for the previous failed request.
+     * @param failedAuthz the {@link Authorization} header which failed on the previous request.
+     * @return true if there is at least one key left after rotation, false otherwise
+     */
+    public synchronized boolean rotateKeys(Challenge nextChallenge, Authorization failedAuthz) {
+        if (nextChallenge == null) {
+            throw new IllegalArgumentException("nextChallenge cannot be null");
+        }
+        if (this.challenge.equals(nextChallenge)) {
+            if (!this.candidateKeys.isEmpty()
+                    && failedAuthz != null
+                    && this.keyIdentifier.getId(this.candidateKeys.currentKey()).equals(failedAuthz.getKeyId())) {
+                this.candidateKeys = this.candidateKeys.discard();
+            }
+        } else {
+            this.candidateKeys = this.keychain.filterAlgorithms(nextChallenge.getAlgorithms());
+        }
+        this.challenge = nextChallenge;
+        return !this.candidateKeys.isEmpty();
+    }
+
+    /**
+     * Signs a {@link SignatureBuilder} and returns an {@link Authorization} header
+     *
+     * @param signatureBuilder the Request containing the headers to be signed
+     * @return a signed {@link Authorization} header or null if no identities could sign the {@link Challenge}
+     */
+    public Authorization sign(SignatureBuilder signatureBuilder) {
+        if (!candidateKeys.isEmpty()) {
+            Key key = this.candidateKeys.currentKey();
+
+            Algorithm algo = null;
+            for (Algorithm algorithm : key.getAlgorithms()) {
+                if (challenge.getAlgorithms().contains(algorithm)) {
+                    algo = algorithm;
+                    break;
                 }
             }
 
-            if (!keychain.isEmpty()) {
-                Key key = this.keychain.currentKey();
+            Set<String> signHeaders = new LinkedHashSet<String>();
+            signHeaders.addAll(challenge.getHeaders());
 
-                if (key != null) {
+            if (signHeaders.contains(Constants.HEADER_ALL)) {
+                signHeaders.remove(Constants.HEADER_ALL);
+                signHeaders.addAll(signatureBuilder.getHeaderNames());
+            }
 
-                    Algorithm algo = null;
-                    for (Algorithm algorithm : challenge.getAlgorithms()) {
-                        if (key.getAlgorithms().contains(algorithm)) {
-                            algo = algorithm;
-                            break;
-                        }
-                    }
+            List<String> headers = new ArrayList<String>(signHeaders);
 
-                    Set<String> signHeaders = new LinkedHashSet<String>();
-                    signHeaders.addAll(challenge.getHeaders());
+            byte[] signature = key.sign(algo, signatureBuilder.buildContent(headers, Constants.CHARSET));
 
-                    if (signHeaders.contains(Constants.HEADER_ALL)) {
-                        signHeaders.remove(Constants.HEADER_ALL);
-                        signHeaders.addAll(request.getHeaderNames());
-                    }
-
-                    List<String> headers = new ArrayList<String>(signHeaders);
-
-                    byte[] signature = key.sign(algo, request.getSignableContent(headers, Constants.CHARSET));
-
-                    if (signature != null) {
-                        return new Authorization(this.keychain.currentKeyId(), signature, headers, algo);
-                    }
-                }
-
+            if (signature != null) {
+                return new Authorization(
+                        this.keyIdentifier.getId(key), Base64.toBase64String(signature), headers, algo,
+                        this.challenge
+                );
             }
         }
 

@@ -57,7 +57,7 @@
         <module>jce</module>
         <module>bouncycastle</module>
         <module>jsch</module>
-        <module>clientauth</module>
+        <module>helpers</module>
     </modules>
 
     <properties>
@@ -259,7 +259,7 @@
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
-                <artifactId>httpsig-clientauth</artifactId>
+                <artifactId>httpsig-helpers</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>

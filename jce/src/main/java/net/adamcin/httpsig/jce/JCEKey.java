@@ -28,7 +28,6 @@
 package net.adamcin.httpsig.jce;
 
 import net.adamcin.httpsig.api.Algorithm;
-import net.adamcin.httpsig.api.Key;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,7 @@ import java.util.Set;
 /**
  * Default {@link net.adamcin.httpsig.api.Key} implementation for OpenSSH-compliant keys (RSA/DSA)
  */
-public final class JCEKey implements Key {
+public final class JCEKey implements FingerprintableKey {
     private static final Logger LOGGER = LoggerFactory.getLogger(JCEKey.class);
     private static final byte[] EMPTY_BYTES = new byte[0];
 
@@ -81,6 +80,16 @@ public final class JCEKey implements Key {
         return this.fingerprint;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String getFingerprint() {
+        return this.fingerprint;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public Set<Algorithm> getAlgorithms() {
         return Collections.unmodifiableSet(new LinkedHashSet<Algorithm>(keyFormat.getSignatureAlgorithms()));
     }

@@ -38,10 +38,16 @@ public final class Verifier {
     public static final long DEFAULT_SKEW = 300000L;
 
     private final Keychain keychain;
+    private KeyIdentifier keyIdentifier;
     private long skew = DEFAULT_SKEW;
 
     public Verifier(Keychain keychain) {
+        this(keychain, null);
+    }
+
+    public Verifier(Keychain keychain, KeyIdentifier keyIdentifier) {
         this.keychain = keychain != null ? keychain : new DefaultKeychain();
+        this.keyIdentifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
     }
 
     public Keychain getKeychain() {
@@ -66,23 +72,22 @@ public final class Verifier {
      * Verifies the provided {@link Authorization} header against the original {@link Challenge}
      * @param challenge the WWW-Authenticate challenge sent to the client in the previous response
      * @param authorization the authorization header
-     * @return null if valid, the original challenge if not in agreement with the {@link Authorization},
-     *          or a new challenge if signature verification fails.
+     * @return true if valid, false otherwise
      */
-    public Challenge verify(Challenge challenge, Request request, Authorization authorization) {
+    public boolean verify(Challenge challenge, SignatureBuilder signatureBuilder, Authorization authorization) {
         if (challenge == null) {
             throw new IllegalArgumentException("challenge cannot be null");
         }
 
-        if (request == null || authorization == null) {
-            return challenge;
+        if (signatureBuilder == null || authorization == null) {
+            return false;
         }
 
         // if challenge requires :all headers, verify that all headers included in the request are declared by the authorization
         if (challenge.getHeaders().contains(Constants.HEADER_ALL)) {
-            for (String header : request.getHeaderNames()) {
+            for (String header : signatureBuilder.getHeaderNames()) {
                 if (!authorization.getHeaders().contains(header)) {
-                    return challenge;
+                    return false;
                 }
             }
         }
@@ -90,35 +95,35 @@ public final class Verifier {
         // verify that all headers required by the challenge are declared by the authorization
         for (String header : challenge.getHeaders()) {
             if (!header.startsWith(":") && !authorization.getHeaders().contains(header)) {
-                return challenge;
+                return false;
             }
         }
 
         // verify that all headers declared by the authorization are present in the request
         for (String header : authorization.getHeaders()) {
-            if (request.getHeaderValues(header).isEmpty()) {
-                return challenge;
+            if (signatureBuilder.getHeaderValues(header).isEmpty()) {
+                return false;
             }
         }
 
         // if date is declared by the authorization, verify that its value is within $skew of the current time
         if (authorization.getHeaders().contains(Constants.HEADER_DATE) && skew >= 0) {
-            Date requestTime = request.getDateGMT();
+            Date requestTime = signatureBuilder.getDateGMT();
             Date currentTime = new GregorianCalendar(TimeZone.getTimeZone("UTC")).getTime();
             Date past = new Date(currentTime.getTime() - skew);
             Date future = new Date(currentTime.getTime() + skew);
             if (requestTime.before(past) || requestTime.after(future)) {
-                return challenge;
+                return false;
             }
         }
 
-        Key key = keychain.findKey(authorization.getKeyId());
+        Key key = keychain.toMap(this.keyIdentifier).get(authorization.getKeyId());
         if (key != null && key.verify(authorization.getAlgorithm(),
-                                      request.getSignableContent(authorization.getHeaders(), Constants.CHARSET),
+                                      signatureBuilder.buildContent(authorization.getHeaders(), Constants.CHARSET),
                                       authorization.getSignatureBytes())) {
-            return null;
+            return true;
         } else {
-            return challenge.discardKeyId(authorization.getKeyId());
+            return false;
         }
     }
 }

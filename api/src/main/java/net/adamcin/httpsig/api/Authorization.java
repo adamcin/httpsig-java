@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Representation of the "Authorization: SSHKey ..." header sent by the client in response to a {@link Challenge}
+ * Representation of the "Authorization: Signature..." header sent by the client in response to a {@link Challenge}
  */
 public final class Authorization implements Serializable {
 
@@ -43,19 +43,33 @@ public final class Authorization implements Serializable {
     private final String signature;
     private final List<String> headers;
     private final Algorithm algorithm;
+    private final Challenge challenge;
 
+    /**
+     *
+     * @param keyId
+     * @param signature
+     * @param headers
+     * @param algorithm
+     */
     public Authorization(final String keyId, final String signature, final List<String> headers, final Algorithm algorithm) {
+        this(keyId, signature, headers, algorithm, null);
+    }
+
+    /**
+     *
+     * @param keyId
+     * @param signature
+     * @param headers
+     * @param algorithm
+     * @param challenge
+     */
+    public Authorization(final String keyId, final String signature, final List<String> headers, final Algorithm algorithm, final Challenge challenge) {
         this.keyId = keyId;
         this.signature = signature;
         this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Collections.<String>emptyList();
         this.algorithm = algorithm;
-    }
-
-    public Authorization(final String keyId, byte[] signatureBytes, final List<String> headers, final Algorithm algorithm) {
-        this.keyId = keyId;
-        this.signature = Base64.toBase64String(signatureBytes);
-        this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Collections.<String>emptyList();
-        this.algorithm = algorithm;
+        this.challenge = challenge != null ? challenge : Constants.PREEMPTIVE_CHALLENGE;
     }
 
     public String getKeyId() {
@@ -82,6 +96,10 @@ public final class Authorization implements Serializable {
 
     public Algorithm getAlgorithm() {
         return algorithm;
+    }
+
+    public Challenge getChallenge() {
+        return challenge;
     }
 
     public String getHeaderValue() {

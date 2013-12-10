@@ -3,10 +3,11 @@ package net.adamcin.httpsig.api;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -18,50 +19,18 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
 
     private final List<Key> keys = new ArrayList<Key>();
     private final Set<Algorithm> _algorithms = new LinkedHashSet<Algorithm>();
-    private KeyIdentifier keyIdentifier;
 
     public DefaultKeychain() {
-        this(null, null);
+        this(null);
     }
 
-    public DefaultKeychain(KeyIdentifier keyIdentifier) {
-        this.setKeyIdentifier(keyIdentifier);
-    }
-
-    public DefaultKeychain(KeyIdentifier keyIdentifier, Collection<? extends Key> identities) {
-        this(keyIdentifier);
+    public DefaultKeychain(Collection<? extends Key> identities) {
         if (identities != null) {
             this.addAll(identities);
         }
     }
 
-    public DefaultKeychain(Collection<? extends Key> identities) {
-        this(null, identities);
-    }
-
-
-    public KeyIdentifier getKeyIdentifier() {
-        return keyIdentifier;
-    }
-
-    public void setKeyIdentifier(KeyIdentifier keyIdentifier) {
-        if (keyIdentifier != null) {
-            this.keyIdentifier = keyIdentifier;
-        } else {
-            this.keyIdentifier = Constants.DEFAULT_KEY_IDENTIFIER;
-        }
-    }
-
-
-    public Set<String> keyIds() {
-        Set<String> idSet = new HashSet<String>();
-        for (Key key : keys) {
-            idSet.add(this.keyIdentifier.getId(key));
-        }
-        return Collections.unmodifiableSet(idSet);
-    }
-
-    public Set<Algorithm> algorithms() {
+    public Set<Algorithm> getAlgorithms() {
         return Collections.unmodifiableSet(_algorithms);
     }
 
@@ -129,17 +98,6 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
         _algorithms.clear();
     }
 
-    public Key findKey(String keyId) {
-        if (keyId != null) {
-            for (Key key : this) {
-                if (keyId.equals(keyIdentifier.getId(key))) {
-                    return key;
-                }
-            }
-        }
-        return null;
-    }
-
     public Keychain discard() {
         if (isEmpty()) {
             throw new NoSuchElementException("keychain is empty");
@@ -170,12 +128,25 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
         }
     }
 
-    /**
-     *
-     * @return
-     * @throws NoSuchElementException if the keychain is empty
-     */
-    public String currentKeyId() {
-        return keyIdentifier.getId(currentKey());
+    public Keychain filterAlgorithms(Collection<Algorithm> algorithms) {
+        ArrayList<Key> filteredKeys = new ArrayList<Key>();
+        for (Key key : this) {
+            for (Algorithm algorithm : key.getAlgorithms()) {
+                if (algorithms.contains(algorithm)) {
+                    filteredKeys.add(key);
+                }
+            }
+        }
+
+        return new DefaultKeychain(filteredKeys);
+    }
+
+    public Map<String, Key> toMap(KeyIdentifier keyIdentifier) {
+        KeyIdentifier identifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
+        LinkedHashMap<String, Key> map = new LinkedHashMap<String, Key>(this.size());
+        for (Key key : this) {
+            map.put(identifier.getId(key), key);
+        }
+        return Collections.unmodifiableMap(map);
     }
 }
