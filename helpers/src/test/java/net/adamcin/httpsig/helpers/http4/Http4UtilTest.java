@@ -3,7 +3,6 @@ package net.adamcin.httpsig.helpers.http4;
 import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
-import net.adamcin.httpsig.api.Signer;
 import net.adamcin.httpsig.helpers.HttpServerTestBody;
 import net.adamcin.httpsig.jce.AuthorizedKeys;
 import net.adamcin.httpsig.jce.JCEKey;
@@ -18,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.KeyPair;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -30,7 +30,7 @@ public class Http4UtilTest {
         TestBody.test(new HttpServerTestBody() {
             @Override protected void execute() throws Exception {
                 setServlet(new AdminServlet(
-                        Constants.DEFAULT_HEADERS, AuthorizedKeys.newKeychain(
+                        Arrays.asList(Constants.HEADER_REQUEST_LINE, Constants.HEADER_DATE), AuthorizedKeys.newKeychain(
                         KeyTestUtil.getAuthorizedKeysFile()
                 ), null));
 
@@ -42,7 +42,7 @@ public class Http4UtilTest {
                 DefaultHttpClient client = new DefaultHttpClient();
 
                 Http4Util.enableAuth(client, provider, null);
-                HttpUriRequest request = new HttpGet(String.format("http://localhost:%d/index.html", getPort()));
+                HttpUriRequest request = new HttpGet(String.format("http://localhost:%d/index.html?foo=bar", getPort()));
                 HttpResponse response = client.execute(request);
 
                 assertEquals("should return 200", 200, response.getStatusLine().getStatusCode());

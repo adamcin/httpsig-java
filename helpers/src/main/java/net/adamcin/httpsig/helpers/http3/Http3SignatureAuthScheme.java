@@ -56,7 +56,10 @@ public final class Http3SignatureAuthScheme extends RFC2617Scheme {
                 }
 
                 SignatureBuilder sigBuilder = new SignatureBuilder();
-                sigBuilder.setRequestLine(String.format("%s %s HTTP/1.1", method.getName(), method.getPath()));
+                sigBuilder.setRequestLine(
+                        String.format("%s %s HTTP/1.1", method.getName(),
+                                      method.getPath() + (method.getQueryString() != null ? "?" + method.getQueryString() : "")));
+
                 for (Header header : method.getRequestHeaders()) {
                     sigBuilder.addHeader(header.getName(), header.getValue());
                 }
@@ -65,6 +68,7 @@ public final class Http3SignatureAuthScheme extends RFC2617Scheme {
                     sigBuilder.addDateNow();
                     method.addRequestHeader(Constants.HEADER_DATE, sigBuilder.getDate());
                 }
+
                 Authorization authorization = creds.getSigner().sign(sigBuilder);
                 this.lastAuthz = authorization;
                 if (authorization != null) {

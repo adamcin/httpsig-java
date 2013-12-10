@@ -125,8 +125,6 @@ public abstract class HttpServerTestBody extends TestBody {
                 resp.getWriter().println("<h1>Ok</h1>");
                 resp.flushBuffer();
             }
-
-            LOGGER.info("[doGet] done");
         }
 
         private boolean handleAuthentication(HttpServletRequest req, HttpServletResponse resp)

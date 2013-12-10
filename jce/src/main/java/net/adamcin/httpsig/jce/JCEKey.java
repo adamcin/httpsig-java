@@ -130,7 +130,6 @@ public final class JCEKey implements FingerprintableKey {
      * {@inheritDoc}
      */
     public byte[] sign(Algorithm algorithm, byte[] challengeHash) {
-        LOGGER.warn("[sign] algo={}", algorithm);
         if (challengeHash == null) {
             throw new IllegalArgumentException("challengeHash cannot be null.");
         }
@@ -144,7 +143,6 @@ public final class JCEKey implements FingerprintableKey {
         if (signature != null) {
             try {
                 signature.initSign(keyPair.getPrivate());
-                LOGGER.warn("[sign] signature={}", signature == null ? "null" : signature.getClass().getName());
                 signature.update(challengeHash);
                 return signature.sign();
             } catch (SignatureException e) {

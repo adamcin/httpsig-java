@@ -15,11 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: madamcin
- * Date: 12/9/13
- * Time: 3:58 PM
- * To change this template use File | Settings | File Templates.
  */
 public final class ServletUtil {
 
@@ -32,6 +27,7 @@ public final class ServletUtil {
             String headerValue = (String) headerValues.nextElement();
             Authorization authorization = Authorization.parse(headerValue);
             if (authorization != null) {
+                System.out.println("server authz: " + authorization.getHeaderValue());
                 return authorization;
             }
         }
@@ -53,14 +49,16 @@ public final class ServletUtil {
         }
 
         SignatureBuilder signatureBuilder = new SignatureBuilder();
+        String path = request.getRequestURI() + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
+
         signatureBuilder.setRequestLine(
                 String.format(
                         "%s %s %s",
-                        request.getMethod(), request.getRequestURI(), request.getProtocol()
+                        request.getMethod(), path, request.getProtocol()
                 )
         );
 
-
+        System.out.println("servlet: " + signatureBuilder.getRequestLine());
         Enumeration headerNames = request.getHeaderNames();
 
         while (headerNames.hasMoreElements()) {

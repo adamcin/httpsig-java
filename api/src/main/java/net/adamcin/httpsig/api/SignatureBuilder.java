@@ -53,7 +53,7 @@ public final class SignatureBuilder implements Serializable {
 
     /**
      * @return the list of header names contained in this {@link SignatureBuilder}, in the order in which they were added, except
-     * for request-line and date
+     * for request-line, which is listed first if present
      */
     public List<String> getHeaderNames() {
         List<String> headerNames = new ArrayList<String>();
@@ -85,7 +85,7 @@ public final class SignatureBuilder implements Serializable {
             /* skip authorization headers and names which begin with a colon */
             return false;
         } else if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
-            return setRequestLine(value);
+            return false;
         } else if (!Constants.HEADER_DATE.equals(_name) || tryParseDate(value)) {
             List<String> values = null;
             if (headers.containsKey(_name)) {
@@ -121,7 +121,9 @@ public final class SignatureBuilder implements Serializable {
      */
     public List<String> getHeaderValues(String name) {
         String _name = name.toLowerCase();
-        if (this.headers.containsKey(_name)) {
+        if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
+            return this.requestLine != null ? Collections.singletonList(this.requestLine) : Collections.<String>emptyList();
+        } else if (this.headers.containsKey(_name)) {
             return Collections.unmodifiableList(this.headers.get(_name));
         } else {
             return Collections.emptyList();
