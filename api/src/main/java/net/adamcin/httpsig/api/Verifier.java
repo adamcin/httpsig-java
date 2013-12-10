@@ -47,7 +47,7 @@ public final class Verifier {
 
     public Verifier(Keychain keychain, KeyIdentifier keyIdentifier) {
         this.keychain = keychain != null ? keychain : new DefaultKeychain();
-        this.keyIdentifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
+        this.keyIdentifier = new CanVerifyIdentifier(keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER);
     }
 
     public Keychain getKeychain() {
@@ -124,6 +124,21 @@ public final class Verifier {
             return true;
         } else {
             return false;
+        }
+    }
+
+    private static class CanVerifyIdentifier implements KeyIdentifier {
+        private KeyIdentifier delegatee;
+
+        private CanVerifyIdentifier(KeyIdentifier delegatee) {
+            this.delegatee = delegatee;
+        }
+
+        public String getId(Key key) {
+            if (key != null && key.canVerify()) {
+                return delegatee.getId(key);
+            }
+            return null;
         }
     }
 }

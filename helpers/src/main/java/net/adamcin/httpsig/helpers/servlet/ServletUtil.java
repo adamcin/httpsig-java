@@ -27,7 +27,6 @@ public final class ServletUtil {
             String headerValue = (String) headerValues.nextElement();
             Authorization authorization = Authorization.parse(headerValue);
             if (authorization != null) {
-                System.out.println("server authz: " + authorization.getHeaderValue());
                 return authorization;
             }
         }
@@ -58,7 +57,6 @@ public final class ServletUtil {
                 )
         );
 
-        System.out.println("servlet: " + signatureBuilder.getRequestLine());
         Enumeration headerNames = request.getHeaderNames();
 
         while (headerNames.hasMoreElements()) {

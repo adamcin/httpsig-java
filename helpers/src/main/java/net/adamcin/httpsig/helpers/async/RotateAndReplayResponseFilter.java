@@ -14,20 +14,16 @@ import net.adamcin.httpsig.api.Signer;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: madamcin
- * Date: 12/9/13
- * Time: 6:47 PM
- * To change this template use File | Settings | File Templates.
+ * Implementation of {@link ResponseFilter} which calls
+ * {@link Signer#rotateKeys(net.adamcin.httpsig.api.Challenge, net.adamcin.httpsig.api.Authorization)} so long as the
+ * response is a 401 or no keys are left to try.
  */
 public class RotateAndReplayResponseFilter implements ResponseFilter {
 
     private final Signer signer;
-    private final String requestLineFormat;
 
-    public RotateAndReplayResponseFilter(Signer signer, String requestLineFormat) {
+    public RotateAndReplayResponseFilter(Signer signer) {
         this.signer = signer;
-        this.requestLineFormat = requestLineFormat;
     }
 
     public FilterContext filter(FilterContext ctx) throws FilterException {
@@ -48,7 +44,6 @@ public class RotateAndReplayResponseFilter implements ResponseFilter {
                         for (String header : headersEntry.getValue()) {
                             authorization = Authorization.parse(header);
                             if (authorization != null) {
-                                //request.getHeaders().delete(Constants.AUTHORIZATION);
                                 break;
                             }
                         }
@@ -57,8 +52,13 @@ public class RotateAndReplayResponseFilter implements ResponseFilter {
 
 
                 boolean replay = signer.rotateKeys(challenge, authorization);
+                if (!replay) {
+                    signer.rotateKeys(challenge);
+                    return ctx;
+                }
+
                 RequestBuilder builder = new RequestBuilder(request);
-                AsyncUtil.calculateSignature(signer, request, builder, requestLineFormat);
+                AsyncUtil.calculateSignature(signer, request, builder, AsyncUtil.REQUEST_LINE_FORMAT);
 
                 return new FilterContext.FilterContextBuilder(ctx)
                         .replayRequest(replay)

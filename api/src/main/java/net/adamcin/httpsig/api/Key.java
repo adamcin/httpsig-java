@@ -42,6 +42,11 @@ public interface Key {
     Set<Algorithm> getAlgorithms();
 
     /**
+     * @return true if this {@link Key} can be used for verification
+     */
+    boolean canVerify();
+
+    /**
      * Verifies the {@code signatureBytes} against the {@code challengeHash} using an underlying public key
      * @param algorithm the selected Signature {@link Algorithm}
      * @param contentBytes the result of {@link SignatureBuilder#buildContent(java.util.List, java.nio.charset.Charset)}
@@ -49,6 +54,11 @@ public interface Key {
      * @return true if signature is valid
      */
     boolean verify(Algorithm algorithm, byte[] contentBytes, byte[] signatureBytes);
+
+    /**
+     * @return true if this {@link Key} can be used for signing
+     */
+    boolean canSign();
 
     /**
      * Signs the {@code challengeHash} using the specified signature {@link Algorithm}

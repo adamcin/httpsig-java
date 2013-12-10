@@ -54,10 +54,28 @@ public final class Signer {
         this.keychain = keychain != null ? keychain : new DefaultKeychain();
         this.keyIdentifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
         this.candidateKeys = this.keychain.filterAlgorithms(challenge.getAlgorithms());
+        this.rotateUntilCanSign();
     }
 
+    private synchronized void rotateUntilCanSign() {
+        while (!this.candidateKeys.isEmpty() && !this.candidateKeys.currentKey().canSign()) {
+            this.candidateKeys = this.candidateKeys.discard();
+        }
+    }
+
+    /**
+     * @return the original keychain supplied to the {@link Signer}
+     */
     public Keychain getKeychain() {
         return keychain;
+    }
+
+    /**
+     * @see #rotateKeys()
+     * @return the {@link Challenge}-filtered and rotated {@link Keychain}
+     */
+    public Keychain getCandidateKeys() {
+        return candidateKeys;
     }
 
     public KeyIdentifier getKeyIdentifier() {
@@ -65,7 +83,15 @@ public final class Signer {
     }
 
     /**
-     * Call this method to rotate the candidate keys
+     * Call this method to rotate the candidate keys back to the original state.
+     * @return true if there is at least one key left after rotation, false otherwise
+     */
+    public synchronized boolean rotateKeys() {
+        return rotateKeys(Constants.PREEMPTIVE_CHALLENGE);
+    }
+
+    /**
+     * Call this method to rotate the candidate keys according to the provided {@link Challenge}.
      * @param nextChallenge the {@link Challenge} header which was returned for the previous failed request.
      * @return true if there is at least one key left after rotation, false otherwise
      */
@@ -92,6 +118,7 @@ public final class Signer {
         } else {
             this.candidateKeys = this.keychain.filterAlgorithms(nextChallenge.getAlgorithms());
         }
+        this.rotateUntilCanSign();
         this.challenge = nextChallenge;
         return !this.candidateKeys.isEmpty();
     }

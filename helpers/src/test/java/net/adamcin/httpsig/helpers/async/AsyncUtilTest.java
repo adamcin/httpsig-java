@@ -7,8 +7,8 @@ import com.ning.http.client.Response;
 import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
+import net.adamcin.httpsig.api.Signer;
 import net.adamcin.httpsig.helpers.HttpServerTestBody;
-import net.adamcin.httpsig.jce.AuthorizedKeys;
 import net.adamcin.httpsig.jce.JCEKey;
 import net.adamcin.httpsig.jce.KeyFormat;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.KeyPair;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -33,30 +34,82 @@ public class AsyncUtilTest {
 
     @Test
     public void testLogin() {
-
         TestBody.test(new HttpServerTestBody() {
-                    @Override
-                    protected void execute() throws Exception {
-                        setServlet(new AdminServlet(Arrays.asList(Constants.HEADER_REQUEST_LINE, Constants.HEADER_DATE), AuthorizedKeys.newKeychain(KeyTestUtil.getAuthorizedKeysFile()), null));
+                    @Override protected void execute() throws Exception {
+                        List<String> headers = Arrays.asList(
+                                Constants.HEADER_REQUEST_LINE,
+                                Constants.HEADER_DATE);
+
+                        setServlet(new AdminServlet(headers));
                         KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
 
                         DefaultKeychain provider = new DefaultKeychain();
                         provider.add(new JCEKey(KeyFormat.SSH_RSA, keyPair));
 
-                        // TODO find out why connection pooling breaks the last request
-                        //AsyncHttpClient client = new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAllowPoolingConnection(false).build());
-                        AsyncHttpClient client = AsyncUtil.getAsyncClient(provider, null);
 
-                        Request request = client.prepareGet(
-                                String.format("http://localhost:%d/index.html?foo=bar", getPort())).build();
+                        AsyncHttpClient client = new AsyncHttpClient();
 
-                        AsyncCompletionHandler<Boolean> handler = DEFAULT_HANDLER;
+                        Signer signer = new Signer(provider, getKeyIdentifier());
+                        Boolean response = AsyncUtil.login(
+                                client, signer,
+                                client.prepareGet(getAbsoluteUrl("/index.html?foo=bar")).build(),
+                                DEFAULT_HANDLER
+                        ).get();
 
-                        assertTrue("login should be successful", client.executeRequest(request, handler).get());
-
+                        assertTrue("login should be successful", response);
                     }
                 }
         );
+    }
 
+    @Test
+    public void testAllHeaders() {
+        TestBody.test(new HttpServerTestBody() {
+            @Override protected void execute() throws Exception {
+                List<String> headers = Arrays.asList(
+                        Constants.HEADER_REQUEST_LINE,
+                        Constants.HEADER_DATE,
+                        "x-test"
+                );
+
+                setServlet(new AdminServlet(headers));
+
+                KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
+
+                DefaultKeychain keychain = new DefaultKeychain();
+                keychain.add(new JCEKey(KeyFormat.SSH_RSA, keyPair));
+
+                Signer signer = new Signer(keychain, getKeyIdentifier());
+                AsyncHttpClient client = new AsyncHttpClient();
+
+                Boolean badResponse = AsyncUtil.login(
+                        client, signer,
+                        client.prepareGet(getAbsoluteUrl("/index.html?foo=bar")).build(),
+                        DEFAULT_HANDLER
+                ).get();
+
+                assertFalse("login should not be successful", badResponse);
+
+                Request goodRequestNoLogin = client.prepareGet(getAbsoluteUrl("/index.html?foo=bar")).addHeader("x-test", "foo").build();
+                Boolean notLoggedIn = client.executeRequest(goodRequestNoLogin, DEFAULT_HANDLER).get();
+                assertFalse("bad subsequent request is not successful", notLoggedIn);
+
+                signer.rotateKeys();
+
+                Boolean goodResponse = AsyncUtil.login(
+                        client, signer,
+                        client.prepareGet(getAbsoluteUrl("/index.html?foo=bar"))
+                                .addHeader("x-test", "foo").build(),
+                        DEFAULT_HANDLER
+                ).get();
+
+                assertTrue("login should be successful", goodResponse);
+
+                Request goodRequestAfterLogin = client.prepareGet(getAbsoluteUrl("/index.html?foo=bar")).addHeader("x-test", "foo").build();
+                Boolean loggedIn = client.executeRequest(goodRequestAfterLogin, DEFAULT_HANDLER).get();
+
+                assertTrue("good subsequent request is successful", loggedIn);
+            }
+        });
     }
 }

@@ -48,8 +48,11 @@ public final class Http4SignatureAuthScheme extends RFC2617Scheme {
             Challenge challenge = new Challenge(this.getRealm(), Constants.parseTokens(headers), Challenge.parseAlgorithms(algorithms));
 
             if (this.rotate) {
-                signer.rotateKeys(challenge, this.lastAuthz);
                 this.rotate = false;
+                if (!signer.rotateKeys(challenge, this.lastAuthz)) {
+                    signer.rotateKeys(challenge);
+                    return null;
+                }
             }
 
             SignatureBuilder sigBuilder = new SignatureBuilder();

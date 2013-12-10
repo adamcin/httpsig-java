@@ -43,6 +43,14 @@ public class MockKey implements Key {
         return fingerprint;
     }
 
+    public boolean canVerify() {
+        return true;
+    }
+
+    public boolean canSign() {
+        return true;
+    }
+
     public boolean verify(Algorithm algorithm, byte[] challengeHash, byte[] signatureBytes) {
         return new StringBuilder(new String(signatureBytes, Constants.CHARSET)).reverse().toString().equals(new String(challengeHash, Constants.CHARSET));
     }

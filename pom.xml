@@ -58,6 +58,7 @@
         <module>bouncycastle</module>
         <module>jsch</module>
         <module>helpers</module>
+        <module>osgi</module>
     </modules>
 
     <properties>
@@ -265,6 +266,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.scr.annotations</artifactId>
+                <version>${scr.annotations.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bndlib</artifactId>
                 <version>2.1.0</version>
@@ -325,6 +332,12 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>${slf4j.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.0.7</version>
                 <scope>test</scope>
             </dependency>
 

@@ -1,44 +1,92 @@
 package net.adamcin.httpsig.helpers.async;
 
+import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.FluentCaseInsensitiveStringsMap;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilderBase;
+import com.ning.http.client.Response;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.KeyIdentifier;
-import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.SignatureBuilder;
 import net.adamcin.httpsig.api.Signer;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public final class AsyncUtil {
 
-    static final String DEFAULT_REQUEST_LINE_FORMAT = "%s %s HTTP/1.1";
+    static final String REQUEST_LINE_FORMAT = "%s %s HTTP/1.1";
 
-    public static AsyncHttpClient getAsyncClient(final Keychain keychain, final KeyIdentifier keyIdentifier) {
-        return getAsyncClient(keychain, keyIdentifier, null);
+    /**
+     * Attaches the provided {@link Signer} to the {@link AsyncHttpClient} as a signature calculator.
+     * It is expected that key rotation and {@link net.adamcin.httpsig.api.Challenge} management is outside the scope
+     * of this method, so only the {@link net.adamcin.httpsig.api.Keychain#currentKey()} will be used, and signature
+     * content will be built according to the last {@link net.adamcin.httpsig.api.Challenge} provided to the
+     * {@link Signer#rotateKeys(net.adamcin.httpsig.api.Challenge)} method.
+     *
+     * @see #login(com.ning.http.client.AsyncHttpClient, net.adamcin.httpsig.api.Signer, com.ning.http.client.Request)
+     * @param client the {@link AsyncHttpClient} to use for
+     * @param signer the {@link Signer} to use for authentication. It's keys must be rotated separately.
+     */
+    public static void enableAuth(final AsyncHttpClient client, final Signer signer) {
+        client.setSignatureCalculator(new AsyncSignatureCalculator(signer));
     }
 
-    public static AsyncHttpClient getAsyncClient(final Keychain keychain, final KeyIdentifier keyIdentifier,
-                                                      final String requestLineFormat) {
+    /**
+     * Executes and replays a login request until one is found which satisfies the
+     * {@link net.adamcin.httpsig.api.Challenge} being returned by the server, or until there are no more keys in the
+     * keychain.
+     * @param client the {@link AsyncHttpClient} to which the {@link Signer} will be attached
+     * @param signer the {@link Signer} used for login and subsequent signature authentication
+     * @param loginRequest the login {@link Request} to be executed and replayed while rotating the keychain
+     * @return a {@link Future} expecting a {@link Response}
+     * @throws IOException if a request throws an exception
+     */
+    public static Future<Response> login(final AsyncHttpClient client,
+                                         final Signer signer,
+                                         final Request loginRequest)
+            throws IOException {
 
-        return getAsyncClient(keychain, keyIdentifier, requestLineFormat, new AsyncHttpClientConfig.Builder());
+        return login(client, signer, loginRequest, new AsyncCompletionHandler<Response>() {
+            @Override
+            public Response onCompleted(Response response) throws Exception {
+                return response;
+            }
+        });
     }
 
-    public static AsyncHttpClient getAsyncClient(final Keychain keychain, final KeyIdentifier keyIdentifier,
-                                                 final String requestLineFormat,
-                                                 final AsyncHttpClientConfig.Builder configBuilder) {
-        final Signer signer = new Signer(keychain, keyIdentifier);
+    /**
+     * Executes and replays a login request until one is found which satisfies the
+     * {@link net.adamcin.httpsig.api.Challenge} being returned by the server, or until there are no more keys in the
+     * keychain.
+     * @param client the {@link AsyncHttpClient} to which the {@link Signer} will be attached
+     * @param signer the {@link Signer} used for login and subsequent signature authentication
+     * @param loginRequest the login {@link Request} to be executed and replayed while rotating the keychain
+     * @param responseHandler an {@link AsyncCompletionHandler} of type {@code T}
+     * @param <T> type parameter for completion handler
+     * @return a {@link Future} of type {@code T}
+     * @throws IOException if thrown by a login request
+     */
+    public static <T> Future<T> login(final AsyncHttpClient client,
+                             final Signer signer,
+                             final Request loginRequest,
+                             AsyncCompletionHandler<T> responseHandler) throws IOException {
 
-        final String _format = requestLineFormat != null ? requestLineFormat : DEFAULT_REQUEST_LINE_FORMAT;
-        configBuilder.addResponseFilter(new RotateAndReplayResponseFilter(signer, _format));
-        AsyncHttpClient client = new AsyncHttpClient(configBuilder.build());
-        client.setSignatureCalculator(new AsyncSignatureCalculator(signer, _format));
-        return client;
+        final AsyncHttpClientConfig.Builder configBuilder = new AsyncHttpClientConfig.Builder(client.getConfig());
+        configBuilder.addResponseFilter(new RotateAndReplayResponseFilter(signer));
+        AsyncHttpClient loginClient = new AsyncHttpClient(configBuilder.build());
+
+        enableAuth(loginClient, signer);
+        Future<T> response = loginClient.executeRequest(loginClient
+                                                                .prepareRequest(loginRequest)
+                                                                .setUrl(loginRequest.getUrl()).build(),
+                                                        responseHandler);
+        enableAuth(client, signer);
+        return response;
     }
 
     public static String getRequestLine(Request request, String requestLineFormat) {
@@ -50,7 +98,7 @@ public final class AsyncUtil {
             e.printStackTrace(System.err);
         }
 
-        return String.format(requestLineFormat != null ? requestLineFormat : DEFAULT_REQUEST_LINE_FORMAT, request.getMethod(), path);
+        return String.format(requestLineFormat != null ? requestLineFormat : REQUEST_LINE_FORMAT, request.getMethod(), path);
     }
 
     public static void calculateSignature(Signer signer, Request request, RequestBuilderBase<?> requestBuilder, String requestLineFormat) {
@@ -68,7 +116,6 @@ public final class AsyncUtil {
             requestBuilder.addHeader(Constants.HEADER_DATE, sigBuilder.getDate());
         }
 
-        System.out.println("client: " + sigBuilder.getRequestLine());
         Authorization authz = signer.sign(sigBuilder);
         if (authz != null) {
             requestBuilder.setHeader(Constants.AUTHORIZATION, authz.getHeaderValue());

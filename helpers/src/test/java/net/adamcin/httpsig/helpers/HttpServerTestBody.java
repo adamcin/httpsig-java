@@ -8,6 +8,8 @@ import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.SignatureBuilder;
 import net.adamcin.httpsig.api.Verifier;
 import net.adamcin.httpsig.helpers.servlet.ServletUtil;
+import net.adamcin.httpsig.jce.AuthorizedKeys;
+import net.adamcin.httpsig.testutil.KeyTestUtil;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -32,6 +34,7 @@ public abstract class HttpServerTestBody extends TestBody {
 
     protected Server server = null;
     protected ServletHolder servletHolder = new ServletHolder(new NotFoundServlet());
+    protected KeyIdentifier keyIdentifier = null;
 
     protected HttpServerTestBody() {
         server = new Server(0);
@@ -55,6 +58,18 @@ public abstract class HttpServerTestBody extends TestBody {
         } else {
             return null;
         }
+    }
+
+    protected String getAbsoluteUrl(String requestUrl) {
+        return String.format("http://localhost:%s%s", getPort(), requestUrl);
+    }
+
+    public KeyIdentifier getKeyIdentifier() {
+        return keyIdentifier;
+    }
+
+    public void setKeyIdentifier(KeyIdentifier keyIdentifier) {
+        this.keyIdentifier = keyIdentifier;
     }
 
     @Override
@@ -91,31 +106,47 @@ public abstract class HttpServerTestBody extends TestBody {
     }
 
     @SuppressWarnings("serial")
-    public static class AdminServlet extends HttpServlet {
-        public static final String REALM = AdminServlet.class.getName();
+    public class AdminServlet extends HttpServlet {
+        public final String REALM = getClass().getName();
 
         private final List<String> headers;
-        private final Keychain keychain;
         private final KeyIdentifier keyIdentifier;
-        private final Challenge challenge;
 
-        public AdminServlet(List<String> headers, Keychain keychain, KeyIdentifier keyIdentifier) {
+        private Keychain keychain;
+        private Challenge challenge;
+
+        public AdminServlet(List<String> headers) {
             super();
             this.headers = headers;
-            this.keychain = keychain;
-            this.keyIdentifier = keyIdentifier;
-            this.challenge = new Challenge(REALM, headers, keychain.getAlgorithms());
+            this.keyIdentifier = getKeyIdentifier();
+        }
+
+        protected Keychain getKeychain() throws IOException {
+            if (this.keychain == null) {
+                this.keychain = AuthorizedKeys.newKeychain(KeyTestUtil.getAuthorizedKeysFile());
+            }
+            return this.keychain;
+        }
+
+        protected Challenge getChallenge() throws IOException {
+            if (this.challenge == null) {
+                this.challenge = new Challenge(REALM, this.headers, getKeychain().getAlgorithms());
+            }
+            return this.challenge;
         }
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             Enumeration<String> headerNames = req.getHeaderNames();
-            while (headerNames.hasMoreElements()) {
-                String headerName = headerNames.nextElement();
-                Enumeration<String> headers = req.getHeaders(headerName);
-                while (headers.hasMoreElements()) {
-                    LOGGER.debug("[doGet][header] {}: {}", headerName, headers.nextElement());
+            if (true) {
+                while (headerNames.hasMoreElements()) {
+                    String headerName = headerNames.nextElement();
+                    Enumeration<String> headers = req.getHeaders(headerName);
+                    while (headers.hasMoreElements()) {
+                        LOGGER.info("[doGet][header] {}: {}", headerName, headers.nextElement());
+                    }
                 }
+                LOGGER.info("[doGet] no more headers");
             }
 
             resp.setContentType("text/html");
@@ -132,15 +163,15 @@ public abstract class HttpServerTestBody extends TestBody {
 
             Authorization authorization = ServletUtil.getAuthorization(req);
             if (authorization != null) {
-                Verifier verifier = new Verifier(this.keychain, this.keyIdentifier);
+                Verifier verifier = new Verifier(this.getKeychain(), this.keyIdentifier);
                 SignatureBuilder sigBuilder = ServletUtil.getSignatureBuilder(req);
 
-                if (verifier.verify(challenge, sigBuilder, authorization)) {
+                if (verifier.verify(getChallenge(), sigBuilder, authorization)) {
                     return false;
                 }
             }
 
-            ServletUtil.sendChallenge(req, resp, challenge);
+            ServletUtil.sendChallenge(req, resp, getChallenge());
 
             return true;
         }

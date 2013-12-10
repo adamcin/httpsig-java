@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.KeyPair;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -27,11 +28,12 @@ public class Http3UtilTest {
     @Test
     public void testLogin() {
         TestBody.test(new HttpServerTestBody() {
+
             @Override protected void execute() throws Exception {
-                setServlet(new AdminServlet(
-                        Arrays.asList(Constants.HEADER_REQUEST_LINE, Constants.HEADER_DATE), AuthorizedKeys.newKeychain(
-                        KeyTestUtil.getAuthorizedKeysFile()
-                ), null));
+                List<String> headers = Arrays.asList(
+                        Constants.HEADER_REQUEST_LINE,
+                        Constants.HEADER_DATE);
+                setServlet(new AdminServlet(headers));
 
                 KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
 
@@ -40,8 +42,40 @@ public class Http3UtilTest {
 
                 HttpClient client = new HttpClient();
 
-                Http3Util.enableAuth(client, provider, null);
-                HttpMethod request = new GetMethod(String.format("http://localhost:%d/index.html?foo=bar", getPort()));
+                Http3Util.enableAuth(client, provider, getKeyIdentifier());
+                HttpMethod request = new GetMethod(getAbsoluteUrl("/index.html?foo=bar"));
+                try {
+                    int status = client.executeMethod(request);
+                    assertEquals("should return 200", 200, status);
+                } finally {
+                    request.releaseConnection();
+                }
+            }
+        });
+    }
+
+    @Test
+    public void testAllHeaders() {
+        TestBody.test(new HttpServerTestBody() {
+            @Override protected void execute() throws Exception {
+                List<String> headers = Arrays.asList(
+                        Constants.HEADER_REQUEST_LINE,
+                        Constants.HEADER_DATE,
+                        "x-test"
+                );
+
+                setServlet(new AdminServlet(headers));
+
+                KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
+
+                DefaultKeychain provider = new DefaultKeychain();
+                provider.add(new JCEKey(KeyFormat.SSH_RSA, keyPair));
+
+                HttpClient client = new HttpClient();
+
+                Http3Util.enableAuth(client, provider, getKeyIdentifier());
+                HttpMethod request = new GetMethod(getAbsoluteUrl("/index.html?foo=bar"));
+                request.addRequestHeader("x-test", "foo");
                 try {
                     int status = client.executeMethod(request);
                     assertEquals("should return 200", 200, status);

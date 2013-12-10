@@ -51,8 +51,11 @@ public final class Http3SignatureAuthScheme extends RFC2617Scheme {
             if (signer != null) {
 
                 if (this.rotate) {
-                    signer.rotateKeys(challenge, this.lastAuthz);
                     this.rotate = false;
+                    if (!signer.rotateKeys(challenge, this.lastAuthz)) {
+                        signer.rotateKeys(challenge);
+                        return null;
+                    }
                 }
 
                 SignatureBuilder sigBuilder = new SignatureBuilder();

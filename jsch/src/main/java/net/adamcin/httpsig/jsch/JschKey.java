@@ -96,6 +96,22 @@ public class JschKey implements FingerprintableKey {
         return false;
     }
 
+    public boolean canVerify() {
+        try {
+            return this.getSignature("test".getBytes()) != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean canSign() {
+        try {
+            return identity.getSignature("test".getBytes()) != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private Signature getSignature(byte[] challengeHash) throws Exception {
         if (Algorithm.SSH_RSA == this.algorithm) {
             SignatureRSA signature = new SignatureRSA();

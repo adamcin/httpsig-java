@@ -36,12 +36,12 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <artifactId>httpsig-helpers</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>net.adamcin.httpsig.osgi</artifactId>
+    <packaging>bundle</packaging>
 
 	<name>${project.artifactId}</name>
     <description>
-		Library providing HTTP client and server authentication handlers
+		OSGi Bundle exporting the core HTTP signature API, JCE and BouncyCastle implementations, and helper classes
     </description>
 
 	<inceptionYear>2013</inceptionYear>
@@ -65,6 +65,44 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            net.adamcin.httpsig.api,
+                            net.adamcin.httpsig.jce,
+                            net.adamcin.httpsig.bouncycastle,
+                            net.adamcin.httpsig.helpers.*,
+                            net.adamcin.httpsig.osgi
+                        </Export-Package>
+                        <Private-Package>
+                            net.adamcin.httpsig.osgi.impl.*
+                        </Private-Package>
+                        <Import-Package>
+                            com.ning.http.*;resolution:=optional,
+                            org.apache.commons.httpclient.*;resolution:=optional,
+                            org.apache.http.*;resolution:=optional,
+                            javax.servlet.*;resolution:=optional,
+                            *
+                        </Import-Package>
+                        <Embed-Dependency>
+                            httpsig-api;inline=true,
+                            httpsig-jce;inline=true,
+                            httpsig-bouncycastle;inline=true,
+                            httpsig-helpers;inline=true,
+                            bcpkix-jdk15on,
+                            bcprov-jdk15on
+                        </Embed-Dependency>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>com.github.github</groupId>
@@ -91,32 +129,32 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr.annotations</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.adamcin.httpsig</groupId>
             <artifactId>httpsig-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ning</groupId>
-            <artifactId>async-http-client</artifactId>
-            <version>1.7.8</version>
-            <scope>provided</scope>
+            <groupId>net.adamcin.httpsig</groupId>
+            <artifactId>httpsig-jce</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-            <scope>provided</scope>
+            <groupId>net.adamcin.httpsig</groupId>
+            <artifactId>httpsig-bouncycastle</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.1</version>
-            <scope>provided</scope>
+            <groupId>net.adamcin.httpsig</groupId>
+            <artifactId>httpsig-helpers</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -128,11 +166,6 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>net.adamcin.httpsig</groupId>
-            <artifactId>httpsig-jce</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
             <artifactId>httpsig-test-common</artifactId>
@@ -153,17 +186,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.adamcin.commons</groupId>

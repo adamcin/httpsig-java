@@ -8,6 +8,7 @@ import net.adamcin.httpsig.jce.AuthorizedKeys;
 import net.adamcin.httpsig.jce.JCEKey;
 import net.adamcin.httpsig.jce.KeyFormat;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.KeyPair;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -28,11 +30,14 @@ public class Http4UtilTest {
     @Test
     public void testLogin() {
         TestBody.test(new HttpServerTestBody() {
+
             @Override protected void execute() throws Exception {
-                setServlet(new AdminServlet(
-                        Arrays.asList(Constants.HEADER_REQUEST_LINE, Constants.HEADER_DATE), AuthorizedKeys.newKeychain(
-                        KeyTestUtil.getAuthorizedKeysFile()
-                ), null));
+
+                List<String> headers = Arrays.asList(
+                        Constants.HEADER_REQUEST_LINE,
+                        Constants.HEADER_DATE);
+
+                setServlet(new AdminServlet(headers));
 
                 KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
 
@@ -41,12 +46,51 @@ public class Http4UtilTest {
 
                 DefaultHttpClient client = new DefaultHttpClient();
 
-                Http4Util.enableAuth(client, provider, null);
-                HttpUriRequest request = new HttpGet(String.format("http://localhost:%d/index.html?foo=bar", getPort()));
+                Http4Util.enableAuth(client, provider, getKeyIdentifier());
+                HttpUriRequest request = new HttpGet(getAbsoluteUrl("/index.html?foo=bar"));
                 HttpResponse response = client.execute(request);
 
                 assertEquals("should return 200", 200, response.getStatusLine().getStatusCode());
 
+            }
+        });
+    }
+
+    @Test
+    public void testAllHeaders() {
+        TestBody.test(new HttpServerTestBody() {
+            @Override protected void execute() throws Exception {
+
+                List<String> headers = Arrays.asList(
+                        Constants.HEADER_REQUEST_LINE,
+                        Constants.HEADER_DATE,
+                        "x-test"
+                );
+
+                setServlet(new AdminServlet(headers));
+
+                KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
+
+                DefaultKeychain provider = new DefaultKeychain();
+                provider.add(new JCEKey(KeyFormat.SSH_RSA, keyPair));
+
+                DefaultHttpClient client = new DefaultHttpClient();
+
+                Http4Util.enableAuth(client, provider, getKeyIdentifier());
+
+                HttpUriRequest badRequest = new HttpGet(getAbsoluteUrl("/index.html?foo=bar"));
+                HttpResponse badResponse = client.execute(badRequest);
+
+                badResponse.getEntity().writeTo(new NullOutputStream());
+
+                assertEquals("should return 401", 401, badResponse.getStatusLine().getStatusCode());
+
+                HttpUriRequest goodRequest = new HttpGet(getAbsoluteUrl("/index.html?foo=bar"));
+                goodRequest.addHeader("x-test", "foo");
+                HttpResponse goodResponse = client.execute(goodRequest);
+
+                goodResponse.getEntity().writeTo(new NullOutputStream());
+                assertEquals("should return 200", 200, goodResponse.getStatusLine().getStatusCode());
             }
         });
     }

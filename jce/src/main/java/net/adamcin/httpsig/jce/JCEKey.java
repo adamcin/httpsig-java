@@ -97,6 +97,20 @@ public final class JCEKey implements FingerprintableKey {
     /**
      * {@inheritDoc}
      */
+    public boolean canVerify() {
+        return this.keyPair.getPublic() != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean canSign() {
+        return this.keyPair.getPrivate() != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean verify(Algorithm algorithm, byte[] challengeHash, byte[] signatureBytes) {
         if (challengeHash == null) {
             throw new IllegalArgumentException("challengeHash cannot be null.");
