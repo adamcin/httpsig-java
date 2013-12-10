@@ -145,7 +145,10 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
         KeyIdentifier identifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
         LinkedHashMap<String, Key> map = new LinkedHashMap<String, Key>(this.size());
         for (Key key : this) {
-            map.put(identifier.getId(key), key);
+            String keyId = identifier.getId(key);
+            if (keyId != null) {
+                map.put(keyId, key);
+            }
         }
         return Collections.unmodifiableMap(map);
     }

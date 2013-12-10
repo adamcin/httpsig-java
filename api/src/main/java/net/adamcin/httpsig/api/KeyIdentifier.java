@@ -7,7 +7,7 @@ public interface KeyIdentifier {
 
     /**
      * @param key the {@link Key} to identify
-     * @return the generated keyId
+     * @return the generated keyId or null if the {@link Key} cannot be identified
      */
     String getId(Key key);
 }
