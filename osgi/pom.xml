@@ -76,12 +76,8 @@
                             net.adamcin.httpsig.api,
                             net.adamcin.httpsig.jce,
                             net.adamcin.httpsig.bouncycastle,
-                            net.adamcin.httpsig.helpers.*,
-                            net.adamcin.httpsig.osgi
+                            net.adamcin.httpsig.helpers.*
                         </Export-Package>
-                        <Private-Package>
-                            net.adamcin.httpsig.osgi.impl.*
-                        </Private-Package>
                         <Import-Package>
                             com.ning.http.*;resolution:=optional,
                             org.apache.commons.httpclient.*;resolution:=optional,
