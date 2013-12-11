@@ -39,7 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Constant values used by the SSHKey Specification
+ * Constant values used by the Signature Specification
  */
 public final class Constants {
 
