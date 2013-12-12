@@ -171,9 +171,7 @@ public abstract class HttpServerTestBody extends TestBody {
                 }
             }
 
-            ServletUtil.sendChallenge(req, resp, getChallenge());
-
-            return true;
+            return ServletUtil.sendChallenge(resp, getChallenge());
         }
 
     }

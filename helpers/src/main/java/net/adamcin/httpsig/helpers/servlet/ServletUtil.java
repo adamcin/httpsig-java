@@ -73,11 +73,14 @@ public final class ServletUtil {
         return signatureBuilder;
     }
 
-    public static void sendChallenge(HttpServletRequest req, HttpServletResponse resp, Challenge challenge)
-            throws ServletException, IOException {
-
-        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        resp.setHeader(Constants.CHALLENGE, challenge.getHeaderValue());
-        resp.flushBuffer();
+    public static boolean sendChallenge(HttpServletResponse resp, Challenge challenge) throws IOException {
+        if (!resp.isCommitted()) {
+            resp.resetBuffer();
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.setHeader(Constants.CHALLENGE, challenge.getHeaderValue());
+            resp.flushBuffer();
+            return true;
+        }
+        return false;
     }
 }
