@@ -86,7 +86,6 @@
                             *
                         </Import-Package>
                         <Embed-Dependency>
-                            {maven-resources},
                             httpsig-api;inline=true,
                             httpsig-jce;inline=true,
                             httpsig-bouncycastle;inline=true,
