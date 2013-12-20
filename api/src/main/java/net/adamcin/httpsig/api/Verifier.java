@@ -71,38 +71,45 @@ public final class Verifier {
     /**
      * Verifies the provided {@link Authorization} header against the original {@link Challenge}
      * @param challenge the WWW-Authenticate challenge sent to the client in the previous response
-     * @param authorization the authorization header
-     * @return true if valid, false otherwise
+     * @param signatureBuilder the {@link SignatureBuilder} containing the request header content
+     * @param authorization the {@link Authorization} header to verify
+     * @return true if valid ({@link VerifyResult#SUCCESS}), false otherwise
      */
     public boolean verify(Challenge challenge, SignatureBuilder signatureBuilder, Authorization authorization) {
+        return verifyWithResult(challenge, signatureBuilder, authorization) == VerifyResult.SUCCESS;
+    }
+
+    /**
+     * Verifies the provided {@link Authorization} header against the original {@link Challenge}
+     * @param challenge the WWW-Authenticate challenge sent to the client in the previous response
+     * @param signatureBuilder the {@link SignatureBuilder} containing the request header content
+     * @param authorization the {@link Authorization} header to verify
+     * @return
+     */
+    public VerifyResult verifyWithResult(Challenge challenge, SignatureBuilder signatureBuilder, Authorization authorization) {
         if (challenge == null) {
             throw new IllegalArgumentException("challenge cannot be null");
         }
 
-        if (signatureBuilder == null || authorization == null) {
-            return false;
+        if (signatureBuilder == null) {
+            throw new IllegalArgumentException("signatureBuilder cannot be null");
         }
 
-        // if challenge requires :all headers, verify that all headers included in the request are declared by the authorization
-        if (challenge.getHeaders().contains(Constants.HEADER_ALL)) {
-            for (String header : signatureBuilder.getHeaderNames()) {
-                if (!authorization.getHeaders().contains(header)) {
-                    return false;
-                }
-            }
+        if (authorization == null) {
+            throw new IllegalArgumentException("authorization cannot be null");
         }
 
         // verify that all headers required by the challenge are declared by the authorization
         for (String header : challenge.getHeaders()) {
             if (!header.startsWith(":") && !authorization.getHeaders().contains(header)) {
-                return false;
+                return VerifyResult.CHALLENGE_NOT_SATISFIED;
             }
         }
 
         // verify that all headers declared by the authorization are present in the request
         for (String header : authorization.getHeaders()) {
             if (signatureBuilder.getHeaderValues(header).isEmpty()) {
-                return false;
+                return VerifyResult.INCOMPLETE_REQUEST;
             }
         }
 
@@ -113,17 +120,21 @@ public final class Verifier {
             Date past = new Date(currentTime.getTime() - skew);
             Date future = new Date(currentTime.getTime() + skew);
             if (requestTime.before(past) || requestTime.after(future)) {
-                return false;
+                return VerifyResult.EXPIRED_DATE_HEADER;
             }
         }
 
         Key key = keychain.toMap(this.keyIdentifier).get(authorization.getKeyId());
-        if (key != null && key.verify(authorization.getAlgorithm(),
+        if (key == null) {
+            return VerifyResult.KEY_NOT_FOUND;
+        }
+
+        if (key.verify(authorization.getAlgorithm(),
                                       signatureBuilder.buildContent(authorization.getHeaders(), Constants.CHARSET),
                                       authorization.getSignatureBytes())) {
-            return true;
+            return VerifyResult.SUCCESS;
         } else {
-            return false;
+            return VerifyResult.FAILED_KEY_VERIFY;
         }
     }
 

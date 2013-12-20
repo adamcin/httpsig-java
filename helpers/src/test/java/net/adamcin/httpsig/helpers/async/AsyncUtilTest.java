@@ -25,6 +25,7 @@ import static org.junit.Assert.*;
 public class AsyncUtilTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncUtilTest.class);
 
+    private static final String TEST_URL = "/index.html?path=/may/get/url/encoded&foo=bar";
     private static final AsyncCompletionHandler<Boolean> DEFAULT_HANDLER = new AsyncCompletionHandler<Boolean>() {
         @Override
         public Boolean onCompleted(Response response) throws Exception {
@@ -52,7 +53,7 @@ public class AsyncUtilTest {
                         Signer signer = new Signer(provider, getKeyIdentifier());
                         Boolean response = AsyncUtil.login(
                                 client, signer,
-                                client.prepareGet(getAbsoluteUrl("/index.html?foo=bar")).build(),
+                                client.prepareGet(getAbsoluteUrl(TEST_URL)).build(),
                                 DEFAULT_HANDLER
                         ).get();
 
@@ -84,13 +85,13 @@ public class AsyncUtilTest {
 
                 Boolean badResponse = AsyncUtil.login(
                         client, signer,
-                        client.prepareGet(getAbsoluteUrl("/index.html?foo=bar")).build(),
+                        client.prepareGet(getAbsoluteUrl(TEST_URL)).build(),
                         DEFAULT_HANDLER
                 ).get();
 
                 assertFalse("login should not be successful", badResponse);
 
-                Request goodRequestNoLogin = client.prepareGet(getAbsoluteUrl("/index.html?foo=bar")).addHeader("x-test", "foo").build();
+                Request goodRequestNoLogin = client.prepareGet(getAbsoluteUrl(TEST_URL)).addHeader("x-test", "foo").build();
                 Boolean notLoggedIn = client.executeRequest(goodRequestNoLogin, DEFAULT_HANDLER).get();
                 assertFalse("bad subsequent request is not successful", notLoggedIn);
 
@@ -98,14 +99,14 @@ public class AsyncUtilTest {
 
                 Boolean goodResponse = AsyncUtil.login(
                         client, signer,
-                        client.prepareGet(getAbsoluteUrl("/index.html?foo=bar"))
+                        client.prepareGet(getAbsoluteUrl(TEST_URL))
                                 .addHeader("x-test", "foo").build(),
                         DEFAULT_HANDLER
                 ).get();
 
                 assertTrue("login should be successful", goodResponse);
 
-                Request goodRequestAfterLogin = client.prepareGet(getAbsoluteUrl("/index.html?foo=bar")).addHeader("x-test", "foo").build();
+                Request goodRequestAfterLogin = client.prepareGet(getAbsoluteUrl(TEST_URL)).addHeader("x-test", "foo").build();
                 Boolean loggedIn = client.executeRequest(goodRequestAfterLogin, DEFAULT_HANDLER).get();
 
                 assertTrue("good subsequent request is successful", loggedIn);

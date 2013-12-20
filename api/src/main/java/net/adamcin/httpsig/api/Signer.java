@@ -144,11 +144,6 @@ public final class Signer {
             Set<String> signHeaders = new LinkedHashSet<String>();
             signHeaders.addAll(challenge.getHeaders());
 
-            if (signHeaders.contains(Constants.HEADER_ALL)) {
-                signHeaders.remove(Constants.HEADER_ALL);
-                signHeaders.addAll(signatureBuilder.getHeaderNames());
-            }
-
             List<String> headers = new ArrayList<String>(signHeaders);
 
             byte[] signature = key.sign(algo, signatureBuilder.buildContent(headers, Constants.CHARSET));

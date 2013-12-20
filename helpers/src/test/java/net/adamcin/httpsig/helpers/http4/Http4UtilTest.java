@@ -26,6 +26,7 @@ import static org.junit.Assert.*;
 public class Http4UtilTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(Http4UtilTest.class);
 
+    private static final String TEST_URL = "/index.html?path=/may/get/url/encoded&foo=bar";
 
     @Test
     public void testLogin() {
@@ -47,7 +48,7 @@ public class Http4UtilTest {
                 DefaultHttpClient client = new DefaultHttpClient();
 
                 Http4Util.enableAuth(client, provider, getKeyIdentifier());
-                HttpUriRequest request = new HttpGet(getAbsoluteUrl("/index.html?foo=bar"));
+                HttpUriRequest request = new HttpGet(getAbsoluteUrl(TEST_URL));
                 HttpResponse response = client.execute(request);
 
                 assertEquals("should return 200", 200, response.getStatusLine().getStatusCode());
@@ -78,14 +79,14 @@ public class Http4UtilTest {
 
                 Http4Util.enableAuth(client, provider, getKeyIdentifier());
 
-                HttpUriRequest badRequest = new HttpGet(getAbsoluteUrl("/index.html?foo=bar"));
+                HttpUriRequest badRequest = new HttpGet(getAbsoluteUrl(TEST_URL));
                 HttpResponse badResponse = client.execute(badRequest);
 
                 badResponse.getEntity().writeTo(new NullOutputStream());
 
                 assertEquals("should return 401", 401, badResponse.getStatusLine().getStatusCode());
 
-                HttpUriRequest goodRequest = new HttpGet(getAbsoluteUrl("/index.html?foo=bar"));
+                HttpUriRequest goodRequest = new HttpGet(getAbsoluteUrl(TEST_URL));
                 goodRequest.addHeader("x-test", "foo");
                 HttpResponse goodResponse = client.execute(goodRequest);
 

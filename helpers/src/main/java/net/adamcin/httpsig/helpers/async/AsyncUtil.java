@@ -89,11 +89,20 @@ public final class AsyncUtil {
         return response;
     }
 
+    /**
+     * really? really? So much request munging happens after the {@link AsyncSignatureCalculator} is called...
+     * @param query
+     * @return
+     */
+    public static String escapeQueryString(String query) {
+        return query != null ? query.replaceAll("/", "%2F") : "";
+    }
+
     public static String getRequestLine(Request request, String requestLineFormat) {
         String path = "";
         try {
             URL url = new URL(request.getRawUrl());
-            path = url.getPath() + (url.getQuery() != null ? "?" + url.getQuery() : "");
+            path = url.getPath() + (url.getQuery() != null ? "?" + escapeQueryString(url.getQuery()) : "");
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

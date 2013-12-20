@@ -64,12 +64,6 @@ public final class Constants {
      */
     public static final String KEY_ID = "keyId";
 
-    /**
-     * The challenge headers value indicating that all request headers are required in the signature, excluding the
-     * "authorization" header itself.
-     */
-    public static final String HEADER_ALL = ":all";
-
     public static final String HEADER_REQUEST_LINE = "request-line";
 
     public static final String HEADER_DATE = "date";

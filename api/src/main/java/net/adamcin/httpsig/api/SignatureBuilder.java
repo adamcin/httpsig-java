@@ -28,11 +28,20 @@ public final class SignatureBuilder implements Serializable {
     private final Map<String, List<String>> headers = new LinkedHashMap<String, List<String>>();
 
     /**
-     * Returns a byte array
+     * Returns the signature content as a byte array
+     * @param headers the list of headers to be included in the signed content
+     * @return the result of {@link #buildString(java.util.List)} encoded using the provided {@link Charset}
+     */
+    public byte[] buildContent(List<String> headers, Charset charset) {
+        return buildString(headers).getBytes(charset);
+    }
+
+    /**
+     * Returns the signature content as a String
      * @param headers the list of headers to be included in the signed content
      * @return
      */
-    public byte[] buildContent(List<String> headers, Charset charset) {
+    public String buildString(List<String> headers) {
         StringBuilder hashBuilder = new StringBuilder("");
         if (headers != null) {
             for (String header : headers) {
@@ -48,7 +57,12 @@ public final class SignatureBuilder implements Serializable {
                 }
             }
         }
-        return hashBuilder.toString().trim().getBytes(charset);
+        return hashBuilder.toString().trim();
+    }
+
+    @Override
+    public String toString() {
+        return buildString(this.getHeaderNames());
     }
 
     /**

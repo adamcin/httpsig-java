@@ -138,16 +138,6 @@ public abstract class HttpServerTestBody extends TestBody {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             Enumeration<String> headerNames = req.getHeaderNames();
-            if (true) {
-                while (headerNames.hasMoreElements()) {
-                    String headerName = headerNames.nextElement();
-                    Enumeration<String> headers = req.getHeaders(headerName);
-                    while (headers.hasMoreElements()) {
-                        LOGGER.info("[doGet][header] {}: {}", headerName, headers.nextElement());
-                    }
-                }
-                LOGGER.info("[doGet] no more headers");
-            }
 
             resp.setContentType("text/html");
             if (!handleAuthentication(req, resp)) {
@@ -165,6 +155,10 @@ public abstract class HttpServerTestBody extends TestBody {
             if (authorization != null) {
                 Verifier verifier = new Verifier(this.getKeychain(), this.keyIdentifier);
                 SignatureBuilder sigBuilder = ServletUtil.getSignatureBuilder(req);
+
+                if (true) {
+                    LOGGER.info("[handleAuthentication] sigBuilder: {}", sigBuilder);
+                }
 
                 if (verifier.verify(getChallenge(), sigBuilder, authorization)) {
                     return false;

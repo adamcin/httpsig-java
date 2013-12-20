@@ -24,6 +24,7 @@ import static org.junit.Assert.*;
 public class Http3UtilTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(Http3UtilTest.class);
 
+    private static final String TEST_URL = "/index.html?path=/may/get/url/encoded&foo=bar";
 
     @Test
     public void testLogin() {
@@ -43,7 +44,7 @@ public class Http3UtilTest {
                 HttpClient client = new HttpClient();
 
                 Http3Util.enableAuth(client, provider, getKeyIdentifier());
-                HttpMethod request = new GetMethod(getAbsoluteUrl("/index.html?foo=bar"));
+                HttpMethod request = new GetMethod(getAbsoluteUrl(TEST_URL));
                 try {
                     int status = client.executeMethod(request);
                     assertEquals("should return 200", 200, status);
@@ -74,7 +75,7 @@ public class Http3UtilTest {
                 HttpClient client = new HttpClient();
 
                 Http3Util.enableAuth(client, provider, getKeyIdentifier());
-                HttpMethod request = new GetMethod(getAbsoluteUrl("/index.html?foo=bar"));
+                HttpMethod request = new GetMethod(getAbsoluteUrl(TEST_URL));
                 request.addRequestHeader("x-test", "foo");
                 try {
                     int status = client.executeMethod(request);

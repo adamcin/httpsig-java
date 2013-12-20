@@ -123,6 +123,32 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>autoInstallBundle</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.sling</groupId>
+                        <artifactId>maven-sling-plugin</artifactId>
+                        <version>2.1.0</version>
+
+                        <executions>
+                            <execution>
+                                <goals><goal>install</goal></goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <slingUrl>http://localhost:4502/system/console/install</slingUrl>
+                            <user>admin</user>
+                            <password>admin</password>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.felix</groupId>
