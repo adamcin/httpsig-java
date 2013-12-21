@@ -29,9 +29,9 @@ package net.adamcin.httpsig.api;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import static org.apache.commons.codec.binary.Base64.encodeBase64;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
+import static org.apache.commons.codec.binary.Base64.encodeBase64;
+import static org.junit.Assert.*;
 
 
 public class Base64Test {

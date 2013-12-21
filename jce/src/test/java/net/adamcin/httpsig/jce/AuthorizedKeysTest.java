@@ -5,13 +5,14 @@ import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Base64;
 import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
+import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.api.Key;
 import net.adamcin.httpsig.api.SignatureBuilder;
 import net.adamcin.httpsig.api.Signer;
 import net.adamcin.httpsig.api.Verifier;
-import net.adamcin.httpsig.jce.AuthorizedKeys.*;
+import net.adamcin.httpsig.jce.AuthorizedKeys.AuthorizedKey;
+import net.adamcin.httpsig.jce.AuthorizedKeys.PublicPair;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
-import net.adamcin.httpsig.api.DefaultKeychain;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,6 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Arrays;
 import java.util.List;
-
 
 import static org.junit.Assert.*;
 

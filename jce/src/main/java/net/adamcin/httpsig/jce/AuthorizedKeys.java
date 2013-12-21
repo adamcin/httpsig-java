@@ -1,10 +1,10 @@
 package net.adamcin.httpsig.jce;
 
 import net.adamcin.httpsig.api.Base64;
+import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.api.Key;
 import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.Verifier;
-import net.adamcin.httpsig.api.DefaultKeychain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

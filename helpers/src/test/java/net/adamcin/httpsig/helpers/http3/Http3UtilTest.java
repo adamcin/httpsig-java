@@ -4,7 +4,6 @@ import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.helpers.HttpServerTestBody;
-import net.adamcin.httpsig.jce.AuthorizedKeys;
 import net.adamcin.httpsig.jce.JCEKey;
 import net.adamcin.httpsig.jce.KeyFormat;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
