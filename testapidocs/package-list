@@ -1,0 +1,9 @@
+net.adamcin.httpsig.api
+net.adamcin.httpsig.bouncycastle
+net.adamcin.httpsig.helpers
+net.adamcin.httpsig.helpers.async
+net.adamcin.httpsig.helpers.http3
+net.adamcin.httpsig.helpers.http4
+net.adamcin.httpsig.jce
+net.adamcin.httpsig.jsch
+net.adamcin.httpsig.testutil
