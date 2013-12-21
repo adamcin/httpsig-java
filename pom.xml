@@ -94,6 +94,12 @@
         </developer>
     </developers>
 
+    <licenses>
+        <license>
+            <name>Public Domain (Unlicense)</name>
+        </license>
+    </licenses>
+
     <build>
         <pluginManagement>
             <plugins>
