@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0"?>
 <!--
   ~ This is free and unencumbered software released into the public domain.
   ~
@@ -26,16 +26,9 @@
   ~ For more information, please refer to <http://unlicense.org/>
   -->
 
-<configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+<project name="httpsig-java">
 
-    <root level="INFO">
-        <appender-ref ref="STDOUT"/>
-    </root>
+    <body>
 
-    <logger name="org.apache.http" level="DEBUG"/>
-</configuration>
+    </body>
+</project>

@@ -25,14 +25,30 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.api;
+package net.adamcin.httpsig.jce;
 
-import org.junit.Test;
+import net.adamcin.httpsig.api.Key;
+import net.adamcin.httpsig.api.KeyIdentifier;
 
-public class SignerTest {
+/**
+ * Implementation of {@link KeyIdentifier} which incorporates a username into the keyId string.
+ */
+public class UserFingerprintKeyId implements KeyIdentifier {
+    private String username;
 
-    @Test
-    public void testSign() {
-
+    public UserFingerprintKeyId(String username) {
+        this.username = username;
     }
+
+    public String getId(Key key) {
+        if (key instanceof FingerprintableKey) {
+            return String.format("/%s/%s", username, ((FingerprintableKey) key).getFingerprint());
+        }
+        return null;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
 }

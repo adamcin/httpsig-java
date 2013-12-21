@@ -28,7 +28,7 @@
 package net.adamcin.httpsig.api;
 
 /**
- *
+ * Enumeration of supported HTTP Signature algorithms
  */
 public enum Algorithm {
     RSA_SHA1("rsa-sha1"),

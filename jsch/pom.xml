@@ -41,7 +41,7 @@
 
 	<name>${project.artifactId}</name>
     <description>
-		Library providing a Jsch-based implementation of the SSHKey API
+		Library providing a Jsch-based implementation of the httpsig API
     </description>
 
 	<inceptionYear>2013</inceptionYear>
