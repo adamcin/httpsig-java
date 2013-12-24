@@ -28,7 +28,7 @@
 package net.adamcin.httpsig.http.apache4;
 
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.KeyIdentifier;
+import net.adamcin.httpsig.api.KeyId;
 import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.Signer;
 import org.apache.http.auth.AuthScheme;
@@ -43,7 +43,7 @@ import java.util.Arrays;
 
 public final class Http4Util {
 
-    public static void enableAuth(final AbstractHttpClient client, final Keychain keychain, final KeyIdentifier keyIdentifier) {
+    public static void enableAuth(final AbstractHttpClient client, final Keychain keychain, final KeyId keyId) {
         if (client == null) {
             throw new NullPointerException("client");
         }
@@ -58,7 +58,7 @@ public final class Http4Util {
             }
         });
 
-        Signer signer = new Signer(keychain, keyIdentifier);
+        Signer signer = new Signer(keychain, keyId);
         client.getCredentialsProvider().setCredentials(AuthScope.ANY, new SignerCredentials(signer));
         client.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF,
                                         Arrays.asList(Constants.SCHEME));

@@ -149,7 +149,7 @@ public final class Constants {
         return sb.toString();
     }
 
-    public static final KeyIdentifier DEFAULT_KEY_IDENTIFIER = new KeyIdentifier() {
+    public static final KeyId DEFAULT_KEY_IDENTIFIER = new KeyId() {
         public String getId(Key key) { return key.getId(); }
     };
 

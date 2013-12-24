@@ -28,7 +28,7 @@
 package net.adamcin.httpsig.http.apache3;
 
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.KeyIdentifier;
+import net.adamcin.httpsig.api.KeyId;
 import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.Signer;
 import org.apache.commons.httpclient.HttpClient;
@@ -42,8 +42,8 @@ import java.util.List;
 
 public final class Http3Util {
 
-    public static void enableAuth(HttpClient client, Keychain keychain, KeyIdentifier keyIdentifier) {
-        Signer signer = new Signer(keychain, keyIdentifier);
+    public static void enableAuth(HttpClient client, Keychain keychain, KeyId keyId) {
+        Signer signer = new Signer(keychain, keyId);
         CredentialsProvider credProvider =
             (CredentialsProvider) client.getParams()
                     .getParameter(CredentialsProvider.PROVIDER);

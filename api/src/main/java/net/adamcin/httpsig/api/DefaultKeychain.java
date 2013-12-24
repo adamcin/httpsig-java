@@ -141,8 +141,8 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
         return new DefaultKeychain(filteredKeys);
     }
 
-    public Map<String, Key> toMap(KeyIdentifier keyIdentifier) {
-        KeyIdentifier identifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
+    public Map<String, Key> toMap(KeyId keyIdentifier) {
+        KeyId identifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
         LinkedHashMap<String, Key> map = new LinkedHashMap<String, Key>(this.size());
         for (Key key : this) {
             String keyId = identifier.getId(key);

@@ -73,7 +73,7 @@ public class Http4UtilTest {
 
                 DefaultHttpClient client = new DefaultHttpClient();
 
-                Http4Util.enableAuth(client, provider, getKeyIdentifier());
+                Http4Util.enableAuth(client, provider, getKeyId());
                 HttpUriRequest request = new HttpGet(getAbsoluteUrl(TEST_URL));
                 HttpResponse response = client.execute(request);
 
@@ -103,7 +103,7 @@ public class Http4UtilTest {
 
                 DefaultHttpClient client = new DefaultHttpClient();
 
-                Http4Util.enableAuth(client, provider, getKeyIdentifier());
+                Http4Util.enableAuth(client, provider, getKeyId());
 
                 HttpUriRequest badRequest = new HttpGet(getAbsoluteUrl(TEST_URL));
                 HttpResponse badResponse = client.execute(badRequest);

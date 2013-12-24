@@ -37,7 +37,7 @@ import java.util.Set;
  */
 public final class Signer {
 
-    private KeyIdentifier keyIdentifier;
+    private KeyId keyId;
     private Keychain keychain;
     private Keychain candidateKeys;
     private Challenge challenge = Constants.PREEMPTIVE_CHALLENGE;
@@ -50,9 +50,9 @@ public final class Signer {
         this(keychain, null);
     }
 
-    public Signer(Keychain keychain, KeyIdentifier keyIdentifier) {
+    public Signer(Keychain keychain, KeyId keyId) {
         this.keychain = keychain != null ? keychain : new DefaultKeychain();
-        this.keyIdentifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
+        this.keyId = keyId != null ? keyId : Constants.DEFAULT_KEY_IDENTIFIER;
         this.candidateKeys = this.keychain.filterAlgorithms(challenge.getAlgorithms());
         this.rotateUntilCanSign();
     }
@@ -78,8 +78,8 @@ public final class Signer {
         return candidateKeys;
     }
 
-    public KeyIdentifier getKeyIdentifier() {
-        return keyIdentifier;
+    public KeyId getKeyId() {
+        return keyId;
     }
 
     /**
@@ -112,7 +112,7 @@ public final class Signer {
         if (this.challenge.equals(nextChallenge)) {
             if (!this.candidateKeys.isEmpty()
                     && failedAuthz != null
-                    && this.keyIdentifier.getId(this.candidateKeys.currentKey()).equals(failedAuthz.getKeyId())) {
+                    && this.keyId.getId(this.candidateKeys.currentKey()).equals(failedAuthz.getKeyId())) {
                 this.candidateKeys = this.candidateKeys.discard();
             }
         } else {
@@ -150,7 +150,7 @@ public final class Signer {
 
             if (signature != null) {
                 return new Authorization(
-                        this.keyIdentifier.getId(key), Base64.toBase64String(signature), headers, algo,
+                        this.keyId.getId(key), Base64.toBase64String(signature), headers, algo,
                         this.challenge
                 );
             }

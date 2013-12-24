@@ -38,16 +38,16 @@ public final class Verifier {
     public static final long DEFAULT_SKEW = 300000L;
 
     private final Keychain keychain;
-    private KeyIdentifier keyIdentifier;
+    private KeyId keyId;
     private long skew = DEFAULT_SKEW;
 
     public Verifier(Keychain keychain) {
         this(keychain, null);
     }
 
-    public Verifier(Keychain keychain, KeyIdentifier keyIdentifier) {
+    public Verifier(Keychain keychain, KeyId keyId) {
         this.keychain = keychain != null ? keychain : new DefaultKeychain();
-        this.keyIdentifier = new CanVerifyIdentifier(keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER);
+        this.keyId = new CanVerifyId(keyId != null ? keyId : Constants.DEFAULT_KEY_IDENTIFIER);
     }
 
     public Keychain getKeychain() {
@@ -124,7 +124,7 @@ public final class Verifier {
             }
         }
 
-        Key key = keychain.toMap(this.keyIdentifier).get(authorization.getKeyId());
+        Key key = keychain.toMap(this.keyId).get(authorization.getKeyId());
         if (key == null) {
             return VerifyResult.KEY_NOT_FOUND;
         }
@@ -138,10 +138,10 @@ public final class Verifier {
         }
     }
 
-    private static class CanVerifyIdentifier implements KeyIdentifier {
-        private KeyIdentifier delegatee;
+    private static class CanVerifyId implements KeyId {
+        private KeyId delegatee;
 
-        private CanVerifyIdentifier(KeyIdentifier delegatee) {
+        private CanVerifyId(KeyId delegatee) {
             this.delegatee = delegatee;
         }
 

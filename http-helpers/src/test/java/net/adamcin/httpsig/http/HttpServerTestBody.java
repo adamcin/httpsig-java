@@ -30,7 +30,7 @@ package net.adamcin.httpsig.http;
 import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;
-import net.adamcin.httpsig.api.KeyIdentifier;
+import net.adamcin.httpsig.api.KeyId;
 import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.SignatureContent;
 import net.adamcin.httpsig.api.Verifier;
@@ -61,7 +61,7 @@ public abstract class HttpServerTestBody extends TestBody {
 
     protected Server server = null;
     protected ServletHolder servletHolder = new ServletHolder(new NotFoundServlet());
-    protected KeyIdentifier keyIdentifier = null;
+    protected KeyId keyId = null;
 
     protected HttpServerTestBody() {
         server = new Server(0);
@@ -91,12 +91,12 @@ public abstract class HttpServerTestBody extends TestBody {
         return String.format("http://localhost:%s%s", getPort(), requestUrl);
     }
 
-    public KeyIdentifier getKeyIdentifier() {
-        return keyIdentifier;
+    public KeyId getKeyId() {
+        return keyId;
     }
 
-    public void setKeyIdentifier(KeyIdentifier keyIdentifier) {
-        this.keyIdentifier = keyIdentifier;
+    public void setKeyId(KeyId keyId) {
+        this.keyId = keyId;
     }
 
     @Override
@@ -137,7 +137,7 @@ public abstract class HttpServerTestBody extends TestBody {
         public final String REALM = getClass().getName();
 
         private final List<String> headers;
-        private final KeyIdentifier keyIdentifier;
+        private final KeyId keyId;
 
         private Keychain keychain;
         private Challenge challenge;
@@ -145,7 +145,7 @@ public abstract class HttpServerTestBody extends TestBody {
         public AdminServlet(List<String> headers) {
             super();
             this.headers = headers;
-            this.keyIdentifier = getKeyIdentifier();
+            this.keyId = getKeyId();
         }
 
         protected Keychain getKeychain() throws IOException {
@@ -180,7 +180,7 @@ public abstract class HttpServerTestBody extends TestBody {
 
             Authorization authorization = ServletUtil.getAuthorization(req);
             if (authorization != null) {
-                Verifier verifier = new Verifier(this.getKeychain(), this.keyIdentifier);
+                Verifier verifier = new Verifier(this.getKeychain(), this.keyId);
                 SignatureContent sigBuilder = ServletUtil.getSignatureBuilder(req);
 
                 if (true) {

@@ -77,9 +77,9 @@ public class MockKeychain implements Keychain {
         throw new UnsupportedOperationException("filterAlgorithms not implemented");
     }
 
-    public Map<String, Key> toMap(KeyIdentifier keyIdentifier) {
-        return Collections.<String, Key>singletonMap(keyIdentifier != null ?
-                                                             keyIdentifier.getId(this.mockIdentity) : this.mockIdentity.getId(),
+    public Map<String, Key> toMap(KeyId keyId) {
+        return Collections.<String, Key>singletonMap(keyId != null ?
+                                                             keyId.getId(this.mockIdentity) : this.mockIdentity.getId(),
                                                      this.mockIdentity);
     }
 

@@ -69,7 +69,7 @@ public class Http3UtilTest {
 
                 HttpClient client = new HttpClient();
 
-                Http3Util.enableAuth(client, provider, getKeyIdentifier());
+                Http3Util.enableAuth(client, provider, getKeyId());
                 HttpMethod request = new GetMethod(getAbsoluteUrl(TEST_URL));
                 try {
                     int status = client.executeMethod(request);
@@ -100,7 +100,7 @@ public class Http3UtilTest {
 
                 HttpClient client = new HttpClient();
 
-                Http3Util.enableAuth(client, provider, getKeyIdentifier());
+                Http3Util.enableAuth(client, provider, getKeyId());
                 HttpMethod request = new GetMethod(getAbsoluteUrl(TEST_URL));
                 request.addRequestHeader("x-test", "foo");
                 try {

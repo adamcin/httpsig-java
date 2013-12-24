@@ -77,7 +77,7 @@ public class AsyncUtilTest {
 
                         AsyncHttpClient client = new AsyncHttpClient();
 
-                        Signer signer = new Signer(provider, getKeyIdentifier());
+                        Signer signer = new Signer(provider, getKeyId());
                         Boolean response = AsyncUtil.login(
                                 client, signer,
                                 client.prepareGet(getAbsoluteUrl(TEST_URL)).build(),
@@ -107,7 +107,7 @@ public class AsyncUtilTest {
                 DefaultKeychain keychain = new DefaultKeychain();
                 keychain.add(new SSHKey(KeyFormat.SSH_RSA, keyPair));
 
-                Signer signer = new Signer(keychain, getKeyIdentifier());
+                Signer signer = new Signer(keychain, getKeyId());
                 AsyncHttpClient client = new AsyncHttpClient();
 
                 Boolean badResponse = AsyncUtil.login(

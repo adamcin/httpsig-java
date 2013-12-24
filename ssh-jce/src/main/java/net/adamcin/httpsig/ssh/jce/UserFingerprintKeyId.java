@@ -28,12 +28,12 @@
 package net.adamcin.httpsig.ssh.jce;
 
 import net.adamcin.httpsig.api.Key;
-import net.adamcin.httpsig.api.KeyIdentifier;
+import net.adamcin.httpsig.api.KeyId;
 
 /**
- * Implementation of {@link KeyIdentifier} which incorporates a username into the keyId string.
+ * Implementation of {@link net.adamcin.httpsig.api.KeyId} which incorporates a username into the keyId string.
  */
-public class UserFingerprintKeyId implements KeyIdentifier {
+public class UserFingerprintKeyId implements KeyId {
     private String username;
 
     public UserFingerprintKeyId(String username) {
