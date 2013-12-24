@@ -181,7 +181,7 @@ public abstract class HttpServerTestBody extends TestBody {
             Authorization authorization = ServletUtil.getAuthorization(req);
             if (authorization != null) {
                 Verifier verifier = new Verifier(this.getKeychain(), this.keyId);
-                RequestContent sigBuilder = ServletUtil.getSignatureBuilder(req);
+                RequestContent sigBuilder = ServletUtil.getRequestContent(req);
 
                 if (true) {
                     LOGGER.info("[handleAuthentication] sigBuilder: {}", sigBuilder);

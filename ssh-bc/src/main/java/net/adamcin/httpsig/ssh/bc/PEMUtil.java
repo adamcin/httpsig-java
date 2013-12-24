@@ -50,8 +50,8 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.logging.Logger;
 
-public class PEMHelper {
-    private static final Logger LOGGER = Logger.getLogger(PEMHelper.class.getName());
+public class PEMUtil {
+    private static final Logger LOGGER = Logger.getLogger(PEMUtil.class.getName());
 
     /**
      * Read a single PEM-formatted key

@@ -41,6 +41,8 @@ import java.util.Map;
  */
 public final class Challenge implements Serializable {
 
+    private static final long serialVersionUID = 4044394118184261470L;
+
     private final String realm;
     private final List<String> headers;
     private final List<Algorithm> algorithms;

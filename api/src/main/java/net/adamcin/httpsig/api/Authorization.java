@@ -39,6 +39,8 @@ import java.util.Map;
  */
 public final class Authorization implements Serializable {
 
+    private static final long serialVersionUID = -5642537789425001043L;
+
     private final String keyId;
     private final String signature;
     private final List<String> headers;

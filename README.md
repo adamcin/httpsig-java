@@ -10,31 +10,46 @@ This project is an adaptation of an earlier work I started on an [SSHKey Authent
 
 At some point, I discovered that Joyent had their own implementation of a similar scheme for JavaScript, so I decided to that porting my implementation over to their scheme would be better in the long run, as they had made more progress on a specification as well as already having some adoption. Luckily, I was able to switch over completely to the Joyent spec after only a few weeks of refactoring.
 
+Only the RSA and DSA algorithms are supported at this point, by way of PEM-encoded public and private keys.
+
 Additions to HTTP Signature Spec
 ================================
 
-* Definition of a simple WWW-Authenticate Challenge format to provide limited support for client/server parameter negotiation
+* Definition of a simple WWW-Authenticate Challenge format to provide support for client/server parameter negotiation.
 
-* Two additional signing algorithms based on the SSH public key authentication protocol, defined in [RFC4253](http://tools.ietf.org/html/rfc4253#section-6.6), "ssh-rsa" and "ssh-dss".
-
-*
-The HTTP Signature scheme as specified may seem rather ambiguous for people who generally don't pay attention to authentication details except when asked for a username or password.
-
-
+* Two additional signing algorithms based on the SSH public key authentication protocol, defined in [RFC4253](http://tools.ietf.org/html/rfc4253#section-6.6), "ssh-rsa" and "ssh-dss". I defined these in order to support implementations of the scheme using opaque SSH implementations, where the DER extraction and padding involved in RFC4253 are unavoidable.
 
 Overview
 ========
 
-* *httpsig-api*: Provides the Key and KeyIdentifier interfaces along with concrete implementations for Signer, Verifier, SignatureBuilder, Challenge, and Authorization.
+* **httpsig-api**: Provides the Key and KeyIdentifier interfaces along with concrete implementations for Signer, Verifier, RequestContent, Challenge, and Authorization.
 
-* *httpsig-jce*: Provides a JCE-based Key implementation for RSA and DSA key algorithms.
+* **httpsig-ssh-jce**: Provides a JCE-based Key implementation for SSH RSA and DSA public keys and unencrypted private keys.
 
-* *httpsig-bouncycastle*:
+* **httpsig-ssh-bc**: Use PEMUtil to read encrypted SSH private keys using the BouncyCastle provider.
 
-* *httpsig-helpers*:
+* **httpsig-http-helpers**: Provides helpful utilities for three Java HTTP client implementations (*Apache Commons HttpClient 3.x*, *Apache Http Client 4.x*, *Ning Async Http Client*) as well as for javax.servlet.http on the server-side.
 
-* *net.adamcin.httpsig.osgi*:
+* **net.adamcin.httpsig.osgi**: Convenient OSGi bundle exporting httpsig-api, httpsig-ssh-jce, httpsig-ssh-bc, and httpsig-http-helpers.
 
-* *httpsig-jsch*:
+* **httpsig-ssh-jsch**: Alternative implementation of SSH key support using the JSch API.
 
-* *httpsig-test-common*:
+* **httpsig-test-common**: Provides several public/private SSH key pairs and utility methods for writing unit tests.
+
+API
+===
+
+Challenge
+---------
+
+Authorization
+-------------
+
+RequestContent
+--------------
+
+Signer
+------
+
+Verifier
+--------

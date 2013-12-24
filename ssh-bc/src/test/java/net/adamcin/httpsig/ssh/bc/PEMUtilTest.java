@@ -30,5 +30,5 @@ package net.adamcin.httpsig.ssh.bc;
 /**
  * Why have I procrastinated on this class?
  */
-public class PEMHelperTest {
+public class PEMUtilTest {
 }

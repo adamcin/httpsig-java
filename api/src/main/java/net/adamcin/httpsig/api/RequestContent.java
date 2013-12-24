@@ -24,6 +24,8 @@ public final class RequestContent implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(RequestContent.class.getName());
     public static final String DATE_FORMAT = "EEE MMM d HH:mm:ss yyyy zzz";
 
+    private static final long serialVersionUID = -2968642080214687631L;
+
     private final String requestLine;
     private final Map<String, List<String>> headers;
 

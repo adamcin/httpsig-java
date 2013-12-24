@@ -60,11 +60,11 @@ public final class ServletUtil {
         return null;
     }
 
-    public static RequestContent getSignatureBuilder(HttpServletRequest request) {
-        return getSignatureBuilder(request, null);
+    public static RequestContent getRequestContent(HttpServletRequest request) {
+        return getRequestContent(request, null);
     }
 
-    public static RequestContent getSignatureBuilder(HttpServletRequest request, Collection<String> ignoreHeaders) {
+    public static RequestContent getRequestContent(HttpServletRequest request, Collection<String> ignoreHeaders) {
         final Set<String> _ignore = new HashSet<String>();
 
         if (ignoreHeaders != null) {
