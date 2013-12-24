@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.helpers.async;
+package net.adamcin.httpsig.http.async;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -35,7 +35,7 @@ import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.api.Signer;
-import net.adamcin.httpsig.helpers.HttpServerTestBody;
+import net.adamcin.httpsig.http.HttpServerTestBody;
 import net.adamcin.httpsig.sshjce.SSHKey;
 import net.adamcin.httpsig.sshjce.KeyFormat;
 import net.adamcin.httpsig.testutil.KeyTestUtil;

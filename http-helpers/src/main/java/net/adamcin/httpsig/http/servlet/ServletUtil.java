@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.helpers.servlet;
+package net.adamcin.httpsig.http.servlet;
 
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;

@@ -25,12 +25,12 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.helpers.http4;
+package net.adamcin.httpsig.http.http4;
 
 import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
-import net.adamcin.httpsig.helpers.HttpServerTestBody;
+import net.adamcin.httpsig.http.HttpServerTestBody;
 import net.adamcin.httpsig.sshjce.SSHKey;
 import net.adamcin.httpsig.sshjce.KeyFormat;
 import net.adamcin.httpsig.testutil.KeyTestUtil;

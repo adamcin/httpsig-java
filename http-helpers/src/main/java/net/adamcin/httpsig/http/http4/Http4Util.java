@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.helpers.http4;
+package net.adamcin.httpsig.http.http4;
 
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.KeyIdentifier;

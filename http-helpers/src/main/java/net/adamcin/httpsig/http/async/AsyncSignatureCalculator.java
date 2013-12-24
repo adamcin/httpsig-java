@@ -25,20 +25,27 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.helpers.http3;
+package net.adamcin.httpsig.http.async;
 
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilderBase;
+import com.ning.http.client.SignatureCalculator;
 import net.adamcin.httpsig.api.Signer;
-import org.apache.commons.httpclient.Credentials;
 
-public final class SignerCredentials implements Credentials {
+/**
+ * Implementation of {@link SignatureCalculator} using a {@link Signer}
+ */
+public class AsyncSignatureCalculator implements SignatureCalculator {
+    private final Signer signer;
 
-    private Signer signer;
-
-    public SignerCredentials(Signer signer) {
+    public AsyncSignatureCalculator(Signer signer) {
         this.signer = signer;
     }
 
-    public Signer getSigner() {
-        return signer;
+    /**
+     * {@inheritDoc}
+     */
+    public void calculateAndAddSignature(String url, Request request, RequestBuilderBase<?> requestBuilder) {
+        AsyncUtil.calculateSignature(this.signer, request, requestBuilder, AsyncUtil.REQUEST_LINE_FORMAT);
     }
 }

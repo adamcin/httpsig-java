@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.helpers;
+package net.adamcin.httpsig.http;
 
 import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.httpsig.api.Authorization;
@@ -34,7 +34,7 @@ import net.adamcin.httpsig.api.KeyIdentifier;
 import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.SignatureBuilder;
 import net.adamcin.httpsig.api.Verifier;
-import net.adamcin.httpsig.helpers.servlet.ServletUtil;
+import net.adamcin.httpsig.http.servlet.ServletUtil;
 import net.adamcin.httpsig.sshjce.AuthorizedKeys;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
 import org.eclipse.jetty.server.Server;

@@ -89,7 +89,7 @@
                             httpsig-api;inline=true,
                             httpsig-ssh-jce;inline=true,
                             httpsig-ssh-bc;inline=true,
-                            httpsig-helpers;inline=true,
+                            httpsig-http-helpers;inline=true,
                             bcpkix-jdk15on,
                             bcprov-jdk15on
                         </Embed-Dependency>
@@ -168,7 +168,7 @@
         </dependency>
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
-            <artifactId>httpsig-helpers</artifactId>
+            <artifactId>httpsig-http-helpers</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
