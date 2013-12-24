@@ -36,7 +36,7 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <artifactId>httpsig-helpers</artifactId>
+    <artifactId>httpsig-http-helpers</artifactId>
     <packaging>jar</packaging>
 
 	<name>${project.artifactId}</name>

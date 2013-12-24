@@ -57,7 +57,7 @@
         <module>ssh-jce</module>
         <module>ssh-bc</module>
         <module>ssh-jsch</module>
-        <module>helpers</module>
+        <module>http-helpers</module>
         <module>osgi</module>
     </modules>
 
@@ -270,7 +270,7 @@
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
-                <artifactId>httpsig-helpers</artifactId>
+                <artifactId>httpsig-http-helpers</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
