@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.sshjce;
+package net.adamcin.httpsig.ssh.jce;
 
 import net.adamcin.httpsig.api.Base64;
 import net.adamcin.httpsig.api.DefaultKeychain;

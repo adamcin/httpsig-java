@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.jsch;
+package net.adamcin.httpsig.ssh.jsch;
 
 import com.jcraft.jsch.JSch;
 import net.adamcin.commons.testing.junit.FailUtil;
@@ -37,9 +37,9 @@ import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.SignatureBuilder;
 import net.adamcin.httpsig.api.Signer;
 import net.adamcin.httpsig.api.Verifier;
-import net.adamcin.httpsig.sshjce.AuthorizedKeys;
-import net.adamcin.httpsig.sshjce.KeyFormat;
-import net.adamcin.httpsig.sshjce.SSHKey;
+import net.adamcin.httpsig.ssh.jce.AuthorizedKeys;
+import net.adamcin.httpsig.ssh.jce.KeyFormat;
+import net.adamcin.httpsig.ssh.jce.SSHKey;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -52,9 +52,9 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JschIdentityTest {
+public class JschKeyTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JschIdentityTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JschKeyTest.class);
 
     @Test
     public void testSignature() {

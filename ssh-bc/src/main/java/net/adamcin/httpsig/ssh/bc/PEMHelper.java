@@ -28,8 +28,8 @@
 package net.adamcin.httpsig.ssh.bc;
 
 import net.adamcin.httpsig.api.Key;
-import net.adamcin.httpsig.sshjce.SSHKey;
-import net.adamcin.httpsig.sshjce.KeyFormat;
+import net.adamcin.httpsig.ssh.jce.SSHKey;
+import net.adamcin.httpsig.ssh.jce.KeyFormat;
 import org.bouncycastle.openssl.PEMDecryptorProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;

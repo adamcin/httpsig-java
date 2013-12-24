@@ -35,7 +35,7 @@ import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.SignatureBuilder;
 import net.adamcin.httpsig.api.Verifier;
 import net.adamcin.httpsig.http.servlet.ServletUtil;
-import net.adamcin.httpsig.sshjce.AuthorizedKeys;
+import net.adamcin.httpsig.ssh.jce.AuthorizedKeys;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;

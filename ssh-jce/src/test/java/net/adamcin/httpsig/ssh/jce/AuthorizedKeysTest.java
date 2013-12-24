@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.sshjce;
+package net.adamcin.httpsig.ssh.jce;
 
 import net.adamcin.commons.testing.junit.FailUtil;
 import net.adamcin.httpsig.api.Authorization;
@@ -37,8 +37,8 @@ import net.adamcin.httpsig.api.Key;
 import net.adamcin.httpsig.api.SignatureBuilder;
 import net.adamcin.httpsig.api.Signer;
 import net.adamcin.httpsig.api.Verifier;
-import net.adamcin.httpsig.sshjce.AuthorizedKeys.AuthorizedKey;
-import net.adamcin.httpsig.sshjce.AuthorizedKeys.PublicPair;
+import net.adamcin.httpsig.ssh.jce.AuthorizedKeys.AuthorizedKey;
+import net.adamcin.httpsig.ssh.jce.AuthorizedKeys.PublicPair;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
 import org.junit.Test;
 import org.slf4j.Logger;

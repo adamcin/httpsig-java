@@ -74,9 +74,9 @@
                     <instructions>
                         <Export-Package>
                             net.adamcin.httpsig.api,
-                            net.adamcin.httpsig.jce,
-                            net.adamcin.httpsig.bouncycastle,
-                            net.adamcin.httpsig.helpers.*
+                            net.adamcin.httpsig.ssh.jce,
+                            net.adamcin.httpsig.ssh.bc,
+                            net.adamcin.httpsig.http.*
                         </Export-Package>
                         <Import-Package>
                             com.ning.http.*;resolution:=optional,
