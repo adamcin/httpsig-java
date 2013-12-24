@@ -22,11 +22,11 @@ Additions to HTTP Signature Spec
 Overview
 ========
 
-* **httpsig-api**: Provides the Key and KeyIdentifier interfaces along with concrete implementations for Signer, Verifier, RequestContent, Challenge, and Authorization.
+* **httpsig-api**: Provides the Key, Keychain, and KeyId interfaces along with concrete implementations for Signer, Verifier, RequestContent, Challenge, and Authorization.
 
-* **httpsig-ssh-jce**: Provides a JCE-based Key implementation for SSH RSA and DSA public keys and unencrypted private keys.
+* **httpsig-ssh-jce**: Provides a JCE-based Key implementation for SSH RSA and DSA public keys and unencrypted private keys, with complete support for building Keychains from authorized_keys files.
 
-* **httpsig-ssh-bc**: Use PEMUtil to read encrypted SSH private keys using the BouncyCastle provider.
+* **httpsig-ssh-bc**: Use PEMUtil to read PEM-encoded SSH private keys (even encrypted) using the BouncyCastle provider.
 
 * **httpsig-http-helpers**: Provides helpful utilities for three Java HTTP client implementations (*Apache Commons HttpClient 3.x*, *Apache Http Client 4.x*, *Ning Async Http Client*) as well as for javax.servlet.http on the server-side.
 

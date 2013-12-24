@@ -39,13 +39,9 @@ public final class RequestContent implements Serializable {
         private String requestLine = null;
         private final Map<String, List<String>> headers = new LinkedHashMap<String, List<String>>();
 
-        public boolean setRequestLine(String requestLine) {
-            if (this.requestLine == null) {
-                this.requestLine = requestLine;
-                return true;
-            } else {
-                return false;
-            }
+        public Builder setRequestLine(String requestLine) {
+            this.requestLine = requestLine;
+            return this;
         }
 
         /**
