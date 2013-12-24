@@ -25,17 +25,30 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.jce;
+package net.adamcin.httpsig.sshjce;
 
 import net.adamcin.httpsig.api.Key;
+import net.adamcin.httpsig.api.KeyIdentifier;
 
 /**
- * Interface for public keys which can provide a uniquely identifying fingerprint
+ * Implementation of {@link KeyIdentifier} which incorporates a username into the keyId string.
  */
-public interface FingerprintableKey extends Key {
+public class UserFingerprintKeyId implements KeyIdentifier {
+    private String username;
 
-    /**
-     * @return the public key fingerprint
-     */
-    String getFingerprint();
+    public UserFingerprintKeyId(String username) {
+        this.username = username;
+    }
+
+    public String getId(Key key) {
+        if (key instanceof FingerprintableKey) {
+            return String.format("/%s/%s", username, ((FingerprintableKey) key).getFingerprint());
+        }
+        return null;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
 }

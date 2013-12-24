@@ -36,8 +36,8 @@ import com.jcraft.jsch.jce.SignatureRSA;
 import net.adamcin.httpsig.api.Algorithm;
 import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.api.Keychain;
-import net.adamcin.httpsig.jce.FingerprintableKey;
-import net.adamcin.httpsig.jce.Magic;
+import net.adamcin.httpsig.sshjce.FingerprintableKey;
+import net.adamcin.httpsig.sshjce.Magic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

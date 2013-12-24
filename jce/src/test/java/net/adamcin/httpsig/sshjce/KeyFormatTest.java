@@ -25,14 +25,13 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.jce;
+package net.adamcin.httpsig.sshjce;
 
 import com.jcraft.jsch.HASH;
 import com.jcraft.jsch.jce.MD5;
 import net.adamcin.commons.testing.junit.FailUtil;
 import net.adamcin.httpsig.api.Base64;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -56,7 +55,7 @@ public class KeyFormatTest {
             AuthorizedKeys.AuthorizedKey authorizedKey = authorizedKeys.get(0);
             byte[] keyBlob = Base64.fromBase64String(authorizedKey.getEncodedKey());
 
-            Assert.assertEquals(
+            assertEquals(
                     "KeyFormat.SSH_RSA.getFingerprint() should return same output as JSch fingerprint algorithm",
                     getJschFingerprint(keyBlob), KeyFormat.SSH_RSA.getFingerprint(rsaKeyPair.getPublic())
             );

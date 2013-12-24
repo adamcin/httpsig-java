@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.jce;
+package net.adamcin.httpsig.sshjce;
 
 import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;

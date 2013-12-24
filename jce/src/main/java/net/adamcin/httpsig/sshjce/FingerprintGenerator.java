@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.jce;
+package net.adamcin.httpsig.sshjce;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
