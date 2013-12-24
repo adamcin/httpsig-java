@@ -1,0 +1,4 @@
+net.adamcin.httpsig.http
+net.adamcin.httpsig.http.apache3
+net.adamcin.httpsig.http.apache4
+net.adamcin.httpsig.http.ning
