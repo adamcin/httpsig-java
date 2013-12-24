@@ -44,15 +44,15 @@ import java.util.Set;
 /**
  * Default {@link net.adamcin.httpsig.api.Key} implementation for OpenSSH-compliant keys (RSA/DSA)
  */
-public final class JCEKey implements FingerprintableKey {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JCEKey.class);
+public final class SSHKey implements FingerprintableKey {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SSHKey.class);
     private static final byte[] EMPTY_BYTES = new byte[0];
 
     private final KeyFormat keyFormat;
     private final KeyPair keyPair;
     private final String fingerprint;
 
-    public JCEKey(KeyFormat keyFormat, KeyPair keyPair) {
+    public SSHKey(KeyFormat keyFormat, KeyPair keyPair) {
         if (keyFormat == null) {
             throw new IllegalArgumentException("keyFormat must not be null");
         } else {
@@ -68,7 +68,7 @@ public final class JCEKey implements FingerprintableKey {
         this.fingerprint = keyFormat.getFingerprint(keyPair.getPublic());
     }
 
-    public JCEKey(KeyFormat keyFormat, PublicKey publicKey,
+    public SSHKey(KeyFormat keyFormat, PublicKey publicKey,
                   PrivateKey privateKey) {
         this(keyFormat, new KeyPair(publicKey, privateKey));
     }
@@ -181,7 +181,7 @@ public final class JCEKey implements FingerprintableKey {
             return false;
         }
 
-        JCEKey that = (JCEKey) o;
+        SSHKey that = (SSHKey) o;
 
         if (!fingerprint.equals(that.fingerprint)) {
             return false;

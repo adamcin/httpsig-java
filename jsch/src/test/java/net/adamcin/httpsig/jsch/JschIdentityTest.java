@@ -38,8 +38,8 @@ import net.adamcin.httpsig.api.SignatureBuilder;
 import net.adamcin.httpsig.api.Signer;
 import net.adamcin.httpsig.api.Verifier;
 import net.adamcin.httpsig.jce.AuthorizedKeys;
-import net.adamcin.httpsig.jce.JCEKey;
 import net.adamcin.httpsig.jce.KeyFormat;
+import net.adamcin.httpsig.jce.SSHKey;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -49,7 +49,8 @@ import org.slf4j.LoggerFactory;
 import java.io.Reader;
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JschIdentityTest {
 
@@ -98,7 +99,7 @@ public class JschIdentityTest {
         signatureBuilder.addDateNow();
 
         Signer dsigner = new Signer(new DefaultKeychain(
-                        Arrays.asList(new JCEKey(format, KeyTestUtil.getKeyPairFromProperties(parentName, keyName)))));
+                        Arrays.asList(new SSHKey(format, KeyTestUtil.getKeyPairFromProperties(parentName, keyName)))));
 
         jsigner.rotateKeys(challenge);
         Authorization jpacket = jsigner.sign(signatureBuilder);

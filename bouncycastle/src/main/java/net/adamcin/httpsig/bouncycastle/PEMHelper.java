@@ -28,7 +28,7 @@
 package net.adamcin.httpsig.bouncycastle;
 
 import net.adamcin.httpsig.api.Key;
-import net.adamcin.httpsig.jce.JCEKey;
+import net.adamcin.httpsig.jce.SSHKey;
 import net.adamcin.httpsig.jce.KeyFormat;
 import org.bouncycastle.openssl.PEMDecryptorProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
@@ -80,10 +80,10 @@ public class PEMHelper {
             if (keyPair != null) {
                 if (keyPair.getPrivate() instanceof RSAPrivateKey
                         || keyPair.getPublic() instanceof RSAPublicKey) {
-                    return new JCEKey(KeyFormat.SSH_RSA, keyPair);
+                    return new SSHKey(KeyFormat.SSH_RSA, keyPair);
                 } else if (keyPair.getPrivate() instanceof DSAPrivateKey
                         || keyPair.getPublic() instanceof DSAPublicKey) {
-                    return new JCEKey(KeyFormat.SSH_DSS, keyPair);
+                    return new SSHKey(KeyFormat.SSH_DSS, keyPair);
                 }
             }
 

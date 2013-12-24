@@ -36,7 +36,7 @@ import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.api.Signer;
 import net.adamcin.httpsig.helpers.HttpServerTestBody;
-import net.adamcin.httpsig.jce.JCEKey;
+import net.adamcin.httpsig.jce.SSHKey;
 import net.adamcin.httpsig.jce.KeyFormat;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
 import org.junit.Test;
@@ -72,7 +72,7 @@ public class AsyncUtilTest {
                         KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
 
                         DefaultKeychain provider = new DefaultKeychain();
-                        provider.add(new JCEKey(KeyFormat.SSH_RSA, keyPair));
+                        provider.add(new SSHKey(KeyFormat.SSH_RSA, keyPair));
 
 
                         AsyncHttpClient client = new AsyncHttpClient();
@@ -105,7 +105,7 @@ public class AsyncUtilTest {
                 KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
 
                 DefaultKeychain keychain = new DefaultKeychain();
-                keychain.add(new JCEKey(KeyFormat.SSH_RSA, keyPair));
+                keychain.add(new SSHKey(KeyFormat.SSH_RSA, keyPair));
 
                 Signer signer = new Signer(keychain, getKeyIdentifier());
                 AsyncHttpClient client = new AsyncHttpClient();

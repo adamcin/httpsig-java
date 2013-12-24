@@ -31,7 +31,7 @@ import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.helpers.HttpServerTestBody;
-import net.adamcin.httpsig.jce.JCEKey;
+import net.adamcin.httpsig.jce.SSHKey;
 import net.adamcin.httpsig.jce.KeyFormat;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
 import org.apache.commons.io.output.NullOutputStream;
@@ -69,7 +69,7 @@ public class Http4UtilTest {
                 KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
 
                 DefaultKeychain provider = new DefaultKeychain();
-                provider.add(new JCEKey(KeyFormat.SSH_RSA, keyPair));
+                provider.add(new SSHKey(KeyFormat.SSH_RSA, keyPair));
 
                 DefaultHttpClient client = new DefaultHttpClient();
 
@@ -99,7 +99,7 @@ public class Http4UtilTest {
                 KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
 
                 DefaultKeychain provider = new DefaultKeychain();
-                provider.add(new JCEKey(KeyFormat.SSH_RSA, keyPair));
+                provider.add(new SSHKey(KeyFormat.SSH_RSA, keyPair));
 
                 DefaultHttpClient client = new DefaultHttpClient();
 

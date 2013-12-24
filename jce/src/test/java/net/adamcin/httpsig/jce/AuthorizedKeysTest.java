@@ -152,7 +152,7 @@ public class AuthorizedKeysTest {
                 throw new IllegalArgumentException("unknown key format");
             }
 
-            Key jceKey = new JCEKey(format, keyPair);
+            Key jceKey = new SSHKey(format, keyPair);
             Key akKey = AuthorizedKeys.createPublicIdentity(publicPair);
 
             assertEquals(id + "fingerprints should match", jceKey.getId(), akKey.getId());

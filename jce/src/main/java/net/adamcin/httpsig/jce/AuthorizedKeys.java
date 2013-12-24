@@ -224,7 +224,7 @@ public final class AuthorizedKeys {
 
         try {
             PublicKey publicKey = keyFactory.generatePublic(pair.getSpec());
-            return new JCEKey(pair.getFormat(), publicKey, null);
+            return new SSHKey(pair.getFormat(), publicKey, null);
         } catch (InvalidKeySpecException e) {
             LOGGER.error("this exception should not have been thrown.", e);
         }
