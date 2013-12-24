@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.bouncycastle;
+package net.adamcin.httpsig.sshbc;
 
 import net.adamcin.httpsig.api.Key;
 import net.adamcin.httpsig.sshjce.SSHKey;

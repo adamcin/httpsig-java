@@ -54,7 +54,7 @@
     <modules>
         <module>api</module>
         <module>test-common</module>
-        <module>jce</module>
+        <module>sshjce</module>
         <module>bouncycastle</module>
         <module>jsch</module>
         <module>helpers</module>
@@ -254,7 +254,7 @@
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
-                <artifactId>httpsig-jce</artifactId>
+                <artifactId>httpsig-sshjce</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
