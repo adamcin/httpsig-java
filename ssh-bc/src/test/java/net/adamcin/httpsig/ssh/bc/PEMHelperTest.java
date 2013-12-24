@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-package net.adamcin.httpsig.sshbc;
+package net.adamcin.httpsig.ssh.bc;
 
 /**
  * Why have I procrastinated on this class?
