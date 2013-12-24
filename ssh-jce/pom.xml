@@ -29,20 +29,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-	  <parent>
+	<parent>
         <groupId>net.adamcin.httpsig</groupId>
         <artifactId>httpsig</artifactId>
         <version>0.7.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
     </parent>
 
-    <artifactId>httpsig-bouncycastle</artifactId>
+    <artifactId>httpsig-ssh-jce</artifactId>
     <packaging>jar</packaging>
 
 	<name>${project.artifactId}</name>
     <description>
-			Library providing helper functions using the BouncyCastle library for decrypting keys     
-		</description>
+		Library providing a JCE-based implementation of the httpsig API
+    </description>
 
 	<inceptionYear>2013</inceptionYear>
 
@@ -75,7 +75,7 @@
                     <repositoryOwner>adamcin</repositoryOwner>
                     <repositoryName>httpsig-java</repositoryName>
                     <path>${project.artifactId}</path>
-										<merge>true</merge>
+					<merge>true</merge>
                 </configuration>
                 <executions>
                     <execution>
@@ -116,10 +116,6 @@
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
             <artifactId>httpsig-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.adamcin.httpsig</groupId>
-            <artifactId>httpsig-sshjce</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

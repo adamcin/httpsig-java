@@ -130,7 +130,7 @@
 
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
-            <artifactId>httpsig-jce</artifactId>
+            <artifactId>httpsig-ssh-jce</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

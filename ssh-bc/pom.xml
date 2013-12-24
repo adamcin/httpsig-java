@@ -29,20 +29,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-	<parent>
+	  <parent>
         <groupId>net.adamcin.httpsig</groupId>
         <artifactId>httpsig</artifactId>
         <version>0.7.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
     </parent>
 
-    <artifactId>httpsig-jsch</artifactId>
+    <artifactId>httpsig-ssh-bc</artifactId>
     <packaging>jar</packaging>
 
 	<name>${project.artifactId}</name>
     <description>
-		Library providing a Jsch-based implementation of the httpsig API
-    </description>
+			Library providing helper functions using the BouncyCastle library for decrypting keys     
+		</description>
 
 	<inceptionYear>2013</inceptionYear>
 
@@ -75,7 +75,7 @@
                     <repositoryOwner>adamcin</repositoryOwner>
                     <repositoryName>httpsig-java</repositoryName>
                     <path>${project.artifactId}</path>
-					<merge>true</merge>
+										<merge>true</merge>
                 </configuration>
                 <executions>
                     <execution>
@@ -119,18 +119,14 @@
         </dependency>
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
-            <artifactId>httpsig-jce</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-			<version>0.1.50</version>
+            <artifactId>httpsig-ssh-jce</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
             <artifactId>bndlib</artifactId>
@@ -145,6 +141,13 @@
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
             <artifactId>httpsig-test-common</artifactId>
+			<scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+			<version>0.1.50</version>
+			<scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

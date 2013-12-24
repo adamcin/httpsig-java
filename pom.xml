@@ -54,9 +54,9 @@
     <modules>
         <module>api</module>
         <module>test-common</module>
-        <module>sshjce</module>
-        <module>bouncycastle</module>
-        <module>jsch</module>
+        <module>ssh-jce</module>
+        <module>ssh-bc</module>
+        <module>ssh-jsch</module>
         <module>helpers</module>
         <module>osgi</module>
     </modules>
@@ -254,17 +254,17 @@
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
-                <artifactId>httpsig-sshjce</artifactId>
+                <artifactId>httpsig-ssh-jce</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
-                <artifactId>httpsig-bouncycastle</artifactId>
+                <artifactId>httpsig-ssh-bc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
-                <artifactId>httpsig-jsch</artifactId>
+                <artifactId>httpsig-ssh-jsch</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>

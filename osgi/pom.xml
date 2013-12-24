@@ -87,8 +87,8 @@
                         </Import-Package>
                         <Embed-Dependency>
                             httpsig-api;inline=true,
-                            httpsig-jce;inline=true,
-                            httpsig-bouncycastle;inline=true,
+                            httpsig-ssh-jce;inline=true,
+                            httpsig-ssh-bc;inline=true,
                             httpsig-helpers;inline=true,
                             bcpkix-jdk15on,
                             bcprov-jdk15on
@@ -160,11 +160,11 @@
         </dependency>
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
-            <artifactId>httpsig-jce</artifactId>
+            <artifactId>httpsig-ssh-jce</artifactId>
         </dependency>
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
-            <artifactId>httpsig-bouncycastle</artifactId>
+            <artifactId>httpsig-ssh-bc</artifactId>
         </dependency>
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>

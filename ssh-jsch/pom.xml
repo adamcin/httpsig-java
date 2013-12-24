@@ -36,12 +36,12 @@
 		<relativePath>..</relativePath>
     </parent>
 
-    <artifactId>httpsig-sshjce</artifactId>
+    <artifactId>httpsig-ssh-jsch</artifactId>
     <packaging>jar</packaging>
 
 	<name>${project.artifactId}</name>
     <description>
-		Library providing a JCE-based implementation of the httpsig API
+		Library providing a Jsch-based implementation of the httpsig API
     </description>
 
 	<inceptionYear>2013</inceptionYear>
@@ -118,11 +118,19 @@
             <artifactId>httpsig-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>net.adamcin.httpsig</groupId>
+            <artifactId>httpsig-ssh-jce</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+			<version>0.1.50</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
             <artifactId>bndlib</artifactId>
@@ -137,13 +145,6 @@
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
             <artifactId>httpsig-test-common</artifactId>
-			<scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-			<version>0.1.50</version>
-			<scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
