@@ -20,14 +20,14 @@ import java.util.logging.Logger;
  * Object used to pass per-request context, such as Request Line and HTTP Headers in client/server
  * implementation-independent way.
  */
-public final class SignatureContent implements Serializable {
-    private static final Logger LOGGER = Logger.getLogger(SignatureContent.class.getName());
+public final class RequestContent implements Serializable {
+    private static final Logger LOGGER = Logger.getLogger(RequestContent.class.getName());
     public static final String DATE_FORMAT = "EEE MMM d HH:mm:ss yyyy zzz";
 
     private final String requestLine;
     private final Map<String, List<String>> headers;
 
-    private SignatureContent(final String requestLine, final Map<String, List<String>> headers) {
+    private RequestContent(final String requestLine, final Map<String, List<String>> headers) {
         this.requestLine = requestLine;
         this.headers = headers;
     }
@@ -118,8 +118,8 @@ public final class SignatureContent implements Serializable {
             return this;
         }
 
-        public SignatureContent build() {
-            return new SignatureContent(requestLine, Collections.unmodifiableMap(headers));
+        public RequestContent build() {
+            return new RequestContent(requestLine, Collections.unmodifiableMap(headers));
         }
     }
 
@@ -162,7 +162,7 @@ public final class SignatureContent implements Serializable {
     }
 
     /**
-     * @return the list of header names contained in this {@link SignatureContent}, in the order in which they were added, except
+     * @return the list of header names contained in this {@link RequestContent}, in the order in which they were added, except
      * for request-line, which is listed first if present
      */
     public List<String> getHeaderNames() {

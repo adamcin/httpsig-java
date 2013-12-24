@@ -71,28 +71,28 @@ public final class Verifier {
     /**
      * Verifies the provided {@link Authorization} header against the original {@link Challenge}
      * @param challenge the WWW-Authenticate challenge sent to the client in the previous response
-     * @param signatureContent the {@link SignatureContent} containing the request header content
+     * @param requestContent the {@link RequestContent} containing the request header content
      * @param authorization the {@link Authorization} header to verify
      * @return true if valid ({@link VerifyResult#SUCCESS}), false otherwise
      */
-    public boolean verify(Challenge challenge, SignatureContent signatureContent, Authorization authorization) {
-        return verifyWithResult(challenge, signatureContent, authorization) == VerifyResult.SUCCESS;
+    public boolean verify(Challenge challenge, RequestContent requestContent, Authorization authorization) {
+        return verifyWithResult(challenge, requestContent, authorization) == VerifyResult.SUCCESS;
     }
 
     /**
      * Verifies the provided {@link Authorization} header against the original {@link Challenge}
      * @param challenge the WWW-Authenticate challenge sent to the client in the previous response
-     * @param signatureContent the {@link SignatureContent} containing the request header content
+     * @param requestContent the {@link RequestContent} containing the request header content
      * @param authorization the {@link Authorization} header to verify
      * @return
      */
-    public VerifyResult verifyWithResult(Challenge challenge, SignatureContent signatureContent, Authorization authorization) {
+    public VerifyResult verifyWithResult(Challenge challenge, RequestContent requestContent, Authorization authorization) {
         if (challenge == null) {
             throw new IllegalArgumentException("challenge cannot be null");
         }
 
-        if (signatureContent == null) {
-            throw new IllegalArgumentException("signatureContent cannot be null");
+        if (requestContent == null) {
+            throw new IllegalArgumentException("requestContent cannot be null");
         }
 
         if (authorization == null) {
@@ -108,14 +108,14 @@ public final class Verifier {
 
         // verify that all headers declared by the authorization are present in the request
         for (String header : authorization.getHeaders()) {
-            if (signatureContent.getHeaderValues(header).isEmpty()) {
+            if (requestContent.getHeaderValues(header).isEmpty()) {
                 return VerifyResult.INCOMPLETE_REQUEST;
             }
         }
 
         // if date is declared by the authorization, verify that its value is within $skew of the current time
         if (authorization.getHeaders().contains(Constants.HEADER_DATE) && skew >= 0) {
-            Date requestTime = signatureContent.getDateGMT();
+            Date requestTime = requestContent.getDateGMT();
             Date currentTime = new GregorianCalendar(TimeZone.getTimeZone("UTC")).getTime();
             Date past = new Date(currentTime.getTime() - skew);
             Date future = new Date(currentTime.getTime() + skew);
@@ -130,7 +130,7 @@ public final class Verifier {
         }
 
         if (key.verify(authorization.getAlgorithm(),
-                                      signatureContent.getContent(authorization.getHeaders(), Constants.CHARSET),
+                                      requestContent.getContent(authorization.getHeaders(), Constants.CHARSET),
                                       authorization.getSignatureBytes())) {
             return VerifyResult.SUCCESS;
         } else {

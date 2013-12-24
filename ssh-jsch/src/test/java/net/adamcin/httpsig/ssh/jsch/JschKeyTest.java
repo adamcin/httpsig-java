@@ -34,7 +34,7 @@ import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.api.Keychain;
-import net.adamcin.httpsig.api.SignatureContent;
+import net.adamcin.httpsig.api.RequestContent;
 import net.adamcin.httpsig.api.Signer;
 import net.adamcin.httpsig.api.Verifier;
 import net.adamcin.httpsig.ssh.jce.AuthorizedKeys;
@@ -95,26 +95,26 @@ public class JschKeyTest {
 
         Signer jsigner = new Signer(sprovider);
         Verifier jverifier = new Verifier(sprovider);
-        SignatureContent signatureContent = new SignatureContent.Builder().addDateNow().build();
+        RequestContent requestContent = new RequestContent.Builder().addDateNow().build();
 
         Signer dsigner = new Signer(new DefaultKeychain(
                         Arrays.asList(new SSHKey(format, KeyTestUtil.getKeyPairFromProperties(parentName, keyName)))));
 
         jsigner.rotateKeys(challenge);
-        Authorization jpacket = jsigner.sign(signatureContent);
+        Authorization jpacket = jsigner.sign(requestContent);
 
         dsigner.rotateKeys(challenge);
-        Authorization dpacket = dsigner.sign(signatureContent);
+        Authorization dpacket = dsigner.sign(requestContent);
 
         LOGGER.info(id + "jpacket={}, dpacket={}", KeyTestUtil.bytesToHex(jpacket.getSignatureBytes()),
                     KeyTestUtil.bytesToHex(dpacket.getSignatureBytes()));
 
         assertEquals(id + "jce fingerprints should match", fingerprint, dsigner.getKeychain().currentKey().getId());
-        assertTrue(id + "round trip using jce identities", dverifier.verify(challenge, signatureContent, dpacket));
-        assertTrue(id + "round trip using JschIdentities", jverifier.verify(challenge, signatureContent, jpacket));
+        assertTrue(id + "round trip using jce identities", dverifier.verify(challenge, requestContent, dpacket));
+        assertTrue(id + "round trip using JschIdentities", jverifier.verify(challenge, requestContent, jpacket));
 
-        assertTrue(id + "round trip using jverifier + dsigner", jverifier.verify(challenge, signatureContent, dpacket));
-        assertTrue(id + "round trip using dverifier + jsigner", dverifier.verify(challenge, signatureContent, jpacket));
+        assertTrue(id + "round trip using jverifier + dsigner", jverifier.verify(challenge, requestContent, dpacket));
+        assertTrue(id + "round trip using dverifier + jsigner", dverifier.verify(challenge, requestContent, jpacket));
     }
 
 }

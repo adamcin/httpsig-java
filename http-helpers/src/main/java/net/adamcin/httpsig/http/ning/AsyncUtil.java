@@ -36,7 +36,7 @@ import com.ning.http.client.RequestBuilderBase;
 import com.ning.http.client.Response;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.SignatureContent;
+import net.adamcin.httpsig.api.RequestContent;
 import net.adamcin.httpsig.api.Signer;
 
 import java.io.IOException;
@@ -138,7 +138,7 @@ public final class AsyncUtil {
     }
 
     public static void calculateSignature(Signer signer, Request request, RequestBuilderBase<?> requestBuilder, String requestLineFormat) {
-        SignatureContent.Builder sigBuilder = new SignatureContent.Builder();
+        RequestContent.Builder sigBuilder = new RequestContent.Builder();
 
         sigBuilder.setRequestLine(AsyncUtil.getRequestLine(request, requestLineFormat));
         for (FluentCaseInsensitiveStringsMap.Entry<String, List<String>> entry : request.getHeaders().entrySet()) {

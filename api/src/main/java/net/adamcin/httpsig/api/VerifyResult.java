@@ -28,7 +28,7 @@
 package net.adamcin.httpsig.api;
 
 /**
- * Enumeration of possible results from {@link Verifier#verifyWithResult(Challenge, SignatureContent, Authorization)}
+ * Enumeration of possible results from {@link Verifier#verifyWithResult(Challenge, RequestContent, Authorization)}
  */
 public enum VerifyResult {
 
@@ -43,7 +43,7 @@ public enum VerifyResult {
     CHALLENGE_NOT_SATISFIED,
 
     /**
-     * Not all headers identified by the {@link Authorization} are present in the {@link SignatureContent}
+     * Not all headers identified by the {@link Authorization} are present in the {@link RequestContent}
      */
     INCOMPLETE_REQUEST,
 

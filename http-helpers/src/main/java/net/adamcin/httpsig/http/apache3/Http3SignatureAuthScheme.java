@@ -30,7 +30,7 @@ package net.adamcin.httpsig.http.apache3;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.SignatureContent;
+import net.adamcin.httpsig.api.RequestContent;
 import net.adamcin.httpsig.api.Signer;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
@@ -85,7 +85,7 @@ public final class Http3SignatureAuthScheme extends RFC2617Scheme {
                     }
                 }
 
-                SignatureContent.Builder sigBuilder = new SignatureContent.Builder();
+                RequestContent.Builder sigBuilder = new RequestContent.Builder();
                 sigBuilder.setRequestLine(
                         String.format("%s %s HTTP/1.1", method.getName(),
                                       method.getPath() + (method.getQueryString() != null ? "?" + method.getQueryString() : "")));

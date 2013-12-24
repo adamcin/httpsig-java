@@ -45,13 +45,13 @@ public class VerifierTest {
 
                 Keychain identities = new MockKeychain(fingerprint);
                 Verifier v = new Verifier(identities);
-                SignatureContent signatureContent = new SignatureContent.Builder().addDateNow().build();
+                RequestContent requestContent = new RequestContent.Builder().addDateNow().build();
                 Challenge c = new Challenge(VerifierTest.class.getName(), Constants.DEFAULT_HEADERS, Arrays.asList( Algorithm.SSH_RSA ));
 
-                byte[] content = signatureContent.getContent(Constants.DEFAULT_HEADERS, Constants.CHARSET);
+                byte[] content = requestContent.getContent(Constants.DEFAULT_HEADERS, Constants.CHARSET);
                 Authorization a = new Authorization(fingerprint, MockKey.mockSignBase64(content), Constants.DEFAULT_HEADERS, Algorithm.SSH_RSA);
 
-                assertTrue("default verifier should verify mock signature ", v.verify(c, signatureContent, a));
+                assertTrue("default verifier should verify mock signature ", v.verify(c, requestContent, a));
             }
         });
     }

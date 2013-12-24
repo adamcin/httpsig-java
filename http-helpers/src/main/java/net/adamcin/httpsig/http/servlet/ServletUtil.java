@@ -30,7 +30,7 @@ package net.adamcin.httpsig.http.servlet;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.SignatureContent;
+import net.adamcin.httpsig.api.RequestContent;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,11 +60,11 @@ public final class ServletUtil {
         return null;
     }
 
-    public static SignatureContent getSignatureBuilder(HttpServletRequest request) {
+    public static RequestContent getSignatureBuilder(HttpServletRequest request) {
         return getSignatureBuilder(request, null);
     }
 
-    public static SignatureContent getSignatureBuilder(HttpServletRequest request, Collection<String> ignoreHeaders) {
+    public static RequestContent getSignatureBuilder(HttpServletRequest request, Collection<String> ignoreHeaders) {
         final Set<String> _ignore = new HashSet<String>();
 
         if (ignoreHeaders != null) {
@@ -73,7 +73,7 @@ public final class ServletUtil {
             }
         }
 
-        SignatureContent.Builder signatureContent = new SignatureContent.Builder();
+        RequestContent.Builder signatureContent = new RequestContent.Builder();
         String path = request.getRequestURI() + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
 
         signatureContent.setRequestLine(

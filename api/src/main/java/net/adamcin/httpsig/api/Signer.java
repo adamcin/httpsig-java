@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Instance of a Signer, used by an HTTP client to sign a {@link SignatureContent} and create an {@link Authorization}
+ * Instance of a Signer, used by an HTTP client to sign a {@link RequestContent} and create an {@link Authorization}
  */
 public final class Signer {
 
@@ -124,12 +124,12 @@ public final class Signer {
     }
 
     /**
-     * Signs a {@link SignatureContent} and returns an {@link Authorization} header
+     * Signs a {@link RequestContent} and returns an {@link Authorization} header
      *
-     * @param signatureContent the Request containing the headers to be signed
+     * @param requestContent the Request containing the headers to be signed
      * @return a signed {@link Authorization} header or null if no identities could sign the {@link Challenge}
      */
-    public Authorization sign(SignatureContent signatureContent) {
+    public Authorization sign(RequestContent requestContent) {
         if (!candidateKeys.isEmpty()) {
             Key key = this.candidateKeys.currentKey();
 
@@ -146,7 +146,7 @@ public final class Signer {
 
             List<String> headers = new ArrayList<String>(signHeaders);
 
-            byte[] signature = key.sign(algo, signatureContent.getContent(headers, Constants.CHARSET));
+            byte[] signature = key.sign(algo, requestContent.getContent(headers, Constants.CHARSET));
 
             if (signature != null) {
                 return new Authorization(

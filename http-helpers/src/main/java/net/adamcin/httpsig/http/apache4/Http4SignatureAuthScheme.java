@@ -30,7 +30,7 @@ package net.adamcin.httpsig.http.apache4;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.SignatureContent;
+import net.adamcin.httpsig.api.RequestContent;
 import net.adamcin.httpsig.api.Signer;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
@@ -82,7 +82,7 @@ public final class Http4SignatureAuthScheme extends RFC2617Scheme {
                 }
             }
 
-            SignatureContent.Builder sigBuilder = new SignatureContent.Builder();
+            RequestContent.Builder sigBuilder = new RequestContent.Builder();
             sigBuilder.setRequestLine(request.getRequestLine().toString());
 
             for (Header header : request.getAllHeaders()) {
