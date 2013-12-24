@@ -30,7 +30,7 @@ package net.adamcin.httpsig.http.servlet;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.SignatureBuilder;
+import net.adamcin.httpsig.api.SignatureContent;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,11 +60,11 @@ public final class ServletUtil {
         return null;
     }
 
-    public static SignatureBuilder getSignatureBuilder(HttpServletRequest request) {
+    public static SignatureContent getSignatureBuilder(HttpServletRequest request) {
         return getSignatureBuilder(request, null);
     }
 
-    public static SignatureBuilder getSignatureBuilder(HttpServletRequest request, Collection<String> ignoreHeaders) {
+    public static SignatureContent getSignatureBuilder(HttpServletRequest request, Collection<String> ignoreHeaders) {
         final Set<String> _ignore = new HashSet<String>();
 
         if (ignoreHeaders != null) {
@@ -73,10 +73,10 @@ public final class ServletUtil {
             }
         }
 
-        SignatureBuilder signatureBuilder = new SignatureBuilder();
+        SignatureContent.Builder signatureContent = new SignatureContent.Builder();
         String path = request.getRequestURI() + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
 
-        signatureBuilder.setRequestLine(
+        signatureContent.setRequestLine(
                 String.format(
                         "%s %s %s",
                         request.getMethod(), path, request.getProtocol()
@@ -91,12 +91,12 @@ public final class ServletUtil {
                 Enumeration headerValues = request.getHeaders(headerName);
                 while (headerValues.hasMoreElements()) {
                     String headerValue = (String) headerValues.nextElement();
-                    signatureBuilder.addHeader(headerName, headerValue);
+                    signatureContent.addHeader(headerName, headerValue);
                 }
             }
         }
 
-        return signatureBuilder;
+        return signatureContent.build();
     }
 
     public static boolean sendChallenge(HttpServletResponse resp, Challenge challenge) throws IOException {

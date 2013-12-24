@@ -34,7 +34,7 @@ import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.api.Key;
-import net.adamcin.httpsig.api.SignatureBuilder;
+import net.adamcin.httpsig.api.SignatureContent;
 import net.adamcin.httpsig.api.Signer;
 import net.adamcin.httpsig.api.Verifier;
 import net.adamcin.httpsig.ssh.jce.AuthorizedKeys.AuthorizedKey;
@@ -163,8 +163,7 @@ public class AuthorizedKeysTest {
             Signer signer = new Signer(signingAndVerifying);
             Verifier sameKeyVerifier = new Verifier(signingAndVerifying);
             Verifier publicKeyVerifier = new Verifier(verifying);
-            SignatureBuilder signatureBuilder = new SignatureBuilder();
-            signatureBuilder.addDateNow();
+            SignatureContent signatureContent = new SignatureContent.Builder().addDateNow().build();
 
             final String realm = getClass().getName();
 
@@ -173,11 +172,11 @@ public class AuthorizedKeysTest {
             signer.rotateKeys(challenge, null);
 
             LOGGER.info("[compareAuthorizedKeyToKeyPair {}] before authorization", id);
-            Authorization authorization = signer.sign(signatureBuilder);
+            Authorization authorization = signer.sign(signatureContent);
 
             LOGGER.info("[compareAuthorizedKeyToKeyPair {}] before verification", id);
-            assertTrue(id + "same key verifier should verify", sameKeyVerifier.verify(challenge, signatureBuilder, authorization));
-            assertTrue(id + "public key verifier should verify", publicKeyVerifier.verify(challenge, signatureBuilder, authorization));
+            assertTrue(id + "same key verifier should verify", sameKeyVerifier.verify(challenge, signatureContent, authorization));
+            assertTrue(id + "public key verifier should verify", publicKeyVerifier.verify(challenge, signatureContent, authorization));
 
         } catch (Exception e) {
             FailUtil.sprintFail(e);

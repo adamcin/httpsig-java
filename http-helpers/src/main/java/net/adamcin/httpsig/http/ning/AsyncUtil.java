@@ -36,7 +36,7 @@ import com.ning.http.client.RequestBuilderBase;
 import com.ning.http.client.Response;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.SignatureBuilder;
+import net.adamcin.httpsig.api.SignatureContent;
 import net.adamcin.httpsig.api.Signer;
 
 import java.io.IOException;
@@ -138,7 +138,7 @@ public final class AsyncUtil {
     }
 
     public static void calculateSignature(Signer signer, Request request, RequestBuilderBase<?> requestBuilder, String requestLineFormat) {
-        SignatureBuilder sigBuilder = new SignatureBuilder();
+        SignatureContent.Builder sigBuilder = new SignatureContent.Builder();
 
         sigBuilder.setRequestLine(AsyncUtil.getRequestLine(request, requestLineFormat));
         for (FluentCaseInsensitiveStringsMap.Entry<String, List<String>> entry : request.getHeaders().entrySet()) {
@@ -147,12 +147,12 @@ public final class AsyncUtil {
             }
         }
 
-        if (sigBuilder.getDate() == null) {
+        if (sigBuilder.build().getDate() == null) {
             sigBuilder.addDateNow();
-            requestBuilder.addHeader(Constants.HEADER_DATE, sigBuilder.getDate());
+            requestBuilder.addHeader(Constants.HEADER_DATE, sigBuilder.build().getDate());
         }
 
-        Authorization authz = signer.sign(sigBuilder);
+        Authorization authz = signer.sign(sigBuilder.build());
         if (authz != null) {
             requestBuilder.setHeader(Constants.AUTHORIZATION, authz.getHeaderValue());
         }

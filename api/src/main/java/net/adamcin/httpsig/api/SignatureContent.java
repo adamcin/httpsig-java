@@ -20,20 +20,116 @@ import java.util.logging.Logger;
  * Object used to pass per-request context, such as Request Line and HTTP Headers in client/server
  * implementation-independent way.
  */
-public final class SignatureBuilder implements Serializable {
-    private static final Logger LOGGER = Logger.getLogger(SignatureBuilder.class.getName());
+public final class SignatureContent implements Serializable {
+    private static final Logger LOGGER = Logger.getLogger(SignatureContent.class.getName());
     public static final String DATE_FORMAT = "EEE MMM d HH:mm:ss yyyy zzz";
 
-    private String requestLine = null;
-    private final Map<String, List<String>> headers = new LinkedHashMap<String, List<String>>();
+    private final String requestLine;
+    private final Map<String, List<String>> headers;
+
+    private SignatureContent(final String requestLine, final Map<String, List<String>> headers) {
+        this.requestLine = requestLine;
+        this.headers = headers;
+    }
+
+    public static final class Builder {
+
+        private String requestLine = null;
+        private final Map<String, List<String>> headers = new LinkedHashMap<String, List<String>>();
+
+        public boolean setRequestLine(String requestLine) {
+            if (this.requestLine == null) {
+                this.requestLine = requestLine;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Adds a header name and value pair
+         * @param name
+         * @param value
+         * @return
+         */
+        public Builder addHeader(final String name, final String value) {
+            final String _name = name.toLowerCase();
+            if (_name.equals(Constants.AUTHORIZATION.toLowerCase()) || _name.startsWith(":")) {
+            /* skip authorization headers and names which begin with a colon */
+                return this;
+            } else if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
+                return this;
+            } else if (!Constants.HEADER_DATE.equals(_name) || tryParseDate(value)) {
+                List<String> values = null;
+                if (headers.containsKey(_name)) {
+                    headers.get(_name);
+                } else {
+                    values = new ArrayList<String>();
+                    headers.put(_name, values);
+                }
+
+                if (values != null) {
+                    values.add(value);
+                }
+            }
+            return this;
+        }
+
+        /**
+         * IMPORTANT: If you call this overload instead of {@link #addHeader(String, String)}, be sure to retrieve the
+         * generated header value to add to your client request using a subsequent call to {@link #getDate()}. This is
+         * merely a convenience method to generate a date header in the correct format.
+         * @param calendar the Calendar to provide
+         * @return true if the date header was successfully set. false if date is already set
+         */
+        public Builder addDate(Calendar calendar) {
+            if (calendar != null) {
+                DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+                dateFormat.setTimeZone(calendar.getTimeZone());
+                this.addHeader(Constants.HEADER_DATE, dateFormat.format(calendar.getTime()));
+            }
+            return this;
+        }
+
+        /**
+         * IMPORTANT: If you call this overload instead of {@link #addHeader(String, String)}, be sure to retrieve the
+         * generated header value to add to your client request using a subsequent call to {@link #getDate()}. This is
+         * merely a convenience method to generate a date header in the correct format.
+         * @param dateGMT the current date in GMT
+         * @return this {@link Builder}
+         */
+        public Builder addDate(Date dateGMT) {
+            if (dateGMT != null) {
+                Calendar calendar = new GregorianCalendar(getGMT());
+                calendar.setTime(dateGMT);
+                this.addDate(calendar);
+            }
+            return this;
+        }
+
+        /**
+         * IMPORTANT: If you call this overload instead of {@link #addHeader(String, String)}, be sure to retrieve the
+         * generated header value to add to your client request using a subsequent call to {@link #getDate()}. This is
+         * merely a convenience method to generate a date header in the correct format.
+         * @return this {@link Builder}
+         */
+        public Builder addDateNow() {
+            addDate(new GregorianCalendar(getGMT()));
+            return this;
+        }
+
+        public SignatureContent build() {
+            return new SignatureContent(requestLine, Collections.unmodifiableMap(headers));
+        }
+    }
 
     /**
      * Returns the signature content as a byte array
      * @param headers the list of headers to be included in the signed content
-     * @return the result of {@link #buildString(java.util.List)} encoded using the provided {@link Charset}
+     * @return the result of {@link #getContentString(java.util.List)} encoded using the provided {@link Charset}
      */
-    public byte[] buildContent(List<String> headers, Charset charset) {
-        return buildString(headers).getBytes(charset);
+    public byte[] getContent(List<String> headers, Charset charset) {
+        return getContentString(headers).getBytes(charset);
     }
 
     /**
@@ -41,7 +137,7 @@ public final class SignatureBuilder implements Serializable {
      * @param headers the list of headers to be included in the signed content
      * @return
      */
-    public String buildString(List<String> headers) {
+    public String getContentString(List<String> headers) {
         StringBuilder hashBuilder = new StringBuilder("");
         if (headers != null) {
             for (String header : headers) {
@@ -62,11 +158,11 @@ public final class SignatureBuilder implements Serializable {
 
     @Override
     public String toString() {
-        return buildString(this.getHeaderNames());
+        return getContentString(this.getHeaderNames());
     }
 
     /**
-     * @return the list of header names contained in this {@link SignatureBuilder}, in the order in which they were added, except
+     * @return the list of header names contained in this {@link SignatureContent}, in the order in which they were added, except
      * for request-line, which is listed first if present
      */
     public List<String> getHeaderNames() {
@@ -78,41 +174,6 @@ public final class SignatureBuilder implements Serializable {
         return Collections.unmodifiableList(headerNames);
     }
 
-    public boolean setRequestLine(String requestLine) {
-        if (this.requestLine == null) {
-            this.requestLine = requestLine;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds a header name and value pair
-     * @param name
-     * @param value
-     * @return
-     */
-    public boolean addHeader(final String name, final String value) {
-        final String _name = name.toLowerCase();
-        if (_name.equals(Constants.AUTHORIZATION.toLowerCase()) || _name.startsWith(":")) {
-            /* skip authorization headers and names which begin with a colon */
-            return false;
-        } else if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
-            return false;
-        } else if (!Constants.HEADER_DATE.equals(_name) || tryParseDate(value)) {
-            List<String> values = null;
-            if (headers.containsKey(_name)) {
-                headers.get(_name);
-            } else {
-                values = new ArrayList<String>();
-                headers.put(_name, values);
-            }
-
-            return values.add(value);
-        }
-        return false;
-    }
 
     /**
      * @return the request-line if set
@@ -150,7 +211,7 @@ public final class SignatureBuilder implements Serializable {
      * @return true if the date header was set successfully. false if the header is already set or the provided
      *         string does not conform to {@link #DATE_FORMAT}
      */
-    public boolean tryParseDate(String date) {
+    private static boolean tryParseDate(String date) {
         if (date != null) {
             try {
                 DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -163,47 +224,6 @@ public final class SignatureBuilder implements Serializable {
         return false;
     }
 
-    /**
-     * IMPORTANT: If you call this overload instead of {@link #addHeader(String, String)}, be sure to retrieve the
-     * generated header value to add to your client request using a subsequent call to {@link #getDate()}. This is
-     * merely a convenience method to generate a date header in the correct format.
-     * @param calendar the Calendar to provide
-     * @return true if the date header was successfully set. false if date is already set
-     */
-    public boolean addDate(Calendar calendar) {
-        if (calendar != null) {
-            DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-            dateFormat.setTimeZone(calendar.getTimeZone());
-            return this.addHeader(Constants.HEADER_DATE, dateFormat.format(calendar.getTime()));
-        }
-        return false;
-    }
-
-    /**
-     * IMPORTANT: If you call this overload instead of {@link #addHeader(String, String)}, be sure to retrieve the
-     * generated header value to add to your client request using a subsequent call to {@link #getDate()}. This is
-     * merely a convenience method to generate a date header in the correct format.
-     * @param dateGMT the current date in GMT
-     * @return true if the date header was successfully set. false if date is already set
-     */
-    public boolean addDate(Date dateGMT) {
-        if (dateGMT != null) {
-            Calendar calendar = new GregorianCalendar(getGMT());
-            calendar.setTime(dateGMT);
-            return this.addDate(calendar);
-        }
-        return false;
-    }
-
-    /**
-     * IMPORTANT: If you call this overload instead of {@link #addHeader(String, String)}, be sure to retrieve the
-     * generated header value to add to your client request using a subsequent call to {@link #getDate()}. This is
-     * merely a convenience method to generate a date header in the correct format.
-     * @return true if the date header was successfully set. false if date is already set
-     */
-    public boolean addDateNow() {
-        return addDate(new GregorianCalendar(getGMT()));
-    }
 
     /**
      * Returns the currently set date header value converted to a {@link Date} object in the GMT time zone

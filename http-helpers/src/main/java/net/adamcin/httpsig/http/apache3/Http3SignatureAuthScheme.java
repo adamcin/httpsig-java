@@ -30,7 +30,7 @@ package net.adamcin.httpsig.http.apache3;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.SignatureBuilder;
+import net.adamcin.httpsig.api.SignatureContent;
 import net.adamcin.httpsig.api.Signer;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
@@ -85,7 +85,7 @@ public final class Http3SignatureAuthScheme extends RFC2617Scheme {
                     }
                 }
 
-                SignatureBuilder sigBuilder = new SignatureBuilder();
+                SignatureContent.Builder sigBuilder = new SignatureContent.Builder();
                 sigBuilder.setRequestLine(
                         String.format("%s %s HTTP/1.1", method.getName(),
                                       method.getPath() + (method.getQueryString() != null ? "?" + method.getQueryString() : "")));
@@ -94,12 +94,12 @@ public final class Http3SignatureAuthScheme extends RFC2617Scheme {
                     sigBuilder.addHeader(header.getName(), header.getValue());
                 }
 
-                if (sigBuilder.getDate() == null) {
+                if (sigBuilder.build().getDate() == null) {
                     sigBuilder.addDateNow();
-                    method.addRequestHeader(Constants.HEADER_DATE, sigBuilder.getDate());
+                    method.addRequestHeader(Constants.HEADER_DATE, sigBuilder.build().getDate());
                 }
 
-                Authorization authorization = creds.getSigner().sign(sigBuilder);
+                Authorization authorization = creds.getSigner().sign(sigBuilder.build());
                 this.lastAuthz = authorization;
                 if (authorization != null) {
                     return authorization.getHeaderValue();

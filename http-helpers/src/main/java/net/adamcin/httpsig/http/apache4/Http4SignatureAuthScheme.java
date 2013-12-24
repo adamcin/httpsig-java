@@ -30,7 +30,7 @@ package net.adamcin.httpsig.http.apache4;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
-import net.adamcin.httpsig.api.SignatureBuilder;
+import net.adamcin.httpsig.api.SignatureContent;
 import net.adamcin.httpsig.api.Signer;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
@@ -82,19 +82,19 @@ public final class Http4SignatureAuthScheme extends RFC2617Scheme {
                 }
             }
 
-            SignatureBuilder sigBuilder = new SignatureBuilder();
+            SignatureContent.Builder sigBuilder = new SignatureContent.Builder();
             sigBuilder.setRequestLine(request.getRequestLine().toString());
 
             for (Header header : request.getAllHeaders()) {
                 sigBuilder.addHeader(header.getName(), header.getValue());
             }
 
-            if (sigBuilder.getDate() == null) {
+            if (sigBuilder.build().getDate() == null) {
                 sigBuilder.addDateNow();
-                request.addHeader(Constants.HEADER_DATE, sigBuilder.getDate());
+                request.addHeader(Constants.HEADER_DATE, sigBuilder.build().getDate());
             }
 
-            Authorization authorization = signer.sign(sigBuilder);
+            Authorization authorization = signer.sign(sigBuilder.build());
             this.lastAuthz = authorization;
             if (authorization != null) {
                 return new BasicHeader(Constants.AUTHORIZATION, authorization.getHeaderValue());
