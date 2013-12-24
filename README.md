@@ -39,8 +39,35 @@ Overview
 API
 ===
 
+Signer
+------
+
+The Signer is the mechanism used by a client to select a Key from the Keychain, and sign the RequestContent in order to construct an Authorization header, which the client can then add to the request.
+
+To create a Signer, you must provide both a Keychain and a KeyId. For example:
+
+    // The DefaultKeychain class is provided for convenience
+    DefaultKeychain keychain = new DefaultKeychain();
+
+    // Use PEMUtil from httpsig-ssh-bc to read an SSH private key from a file
+    keychain.add(PEMUtil.readKey(new File("/home/user/.ssh/id_rsa"), null));
+
+    // The UserFingerprintKeyId class is provided by httpsig-ssh-jce to construct
+    // keyIds of the form, "/${username}/${fingerprint}"
+    Signer signer = new Signer(keychain, new UserFingerprintKeyId("admin"));
+
+For the Signer to select a key...
+
+Verifier
+--------
+
+The Verifier is the mechanism used by a server to verify the signature provided in
+the Authorization header against the Request and the Challenge defined for the server.
+
 Challenge
 ---------
+
+The Challenge class represents a "WWW-Authenticate: Signature" header. It
 
 Authorization
 -------------
@@ -48,8 +75,3 @@ Authorization
 RequestContent
 --------------
 
-Signer
-------
-
-Verifier
---------

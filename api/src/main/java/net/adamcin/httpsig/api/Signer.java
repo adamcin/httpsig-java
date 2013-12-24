@@ -28,6 +28,7 @@
 package net.adamcin.httpsig.api;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,12 +43,12 @@ public final class Signer {
     private Keychain candidateKeys;
     private Challenge challenge = Constants.PREEMPTIVE_CHALLENGE;
 
-    public Signer() {
-        this(null, null);
-    }
-
     public Signer(Keychain keychain) {
         this(keychain, null);
+    }
+
+    public Signer(Key singleKey, KeyId keyId) {
+        this(new DefaultKeychain(Arrays.asList(singleKey)), keyId);
     }
 
     public Signer(Keychain keychain, KeyId keyId) {
