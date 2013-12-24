@@ -29,6 +29,9 @@ package net.adamcin.httpsig.api;
 
 import java.util.Set;
 
+/**
+ * Interface representing an object which can sign content and/or verify signatures
+ */
 public interface Key {
 
     /**
