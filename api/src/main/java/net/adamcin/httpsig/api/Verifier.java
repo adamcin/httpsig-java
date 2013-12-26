@@ -62,6 +62,7 @@ public final class Verifier {
     }
 
     /**
+     * set to a positive number to enforce date header check within server time +/- skew. set to negative number to disable this check altogether.
      * @param skew new server skew in milliseconds
      */
     public void setSkew(long skew) {

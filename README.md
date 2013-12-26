@@ -130,6 +130,14 @@ After parsing an Authorization and building the RequestContent object from the H
 
     // otherwise, send 401 Unauthorized / WWW-Authenticate: Signature
 
+If an Authorization header specifies "date" as a signed header, during verify the Verifier will also compare the Date header value against the server time +/- a millisecond skew, which is set to 300000L (300 seconds) by default. To adjust the skew, the server
+may call verifier.setSkew().
+
+    // one minute skew
+    verifier.setSkew(60000L);
+
+    // disable date checking (not recommended)
+    verifier.setSkew(-1L);
 
 Challenge
 ---------
@@ -138,9 +146,9 @@ The Challenge class represents a "WWW-Authenticate: Signature" header. It follow
 
 * **realm**: The authentication realm defined by RFC2617
 
-* **headers**: The list of headers that are required in Authorization signatures. The order of these headers is not significant.
+* **headers**: The space-delimited list of headers that are required in Authorization signatures. The order of these headers is not significant.
 
-* **algorithms**: The list of signature algorithms supported by the server.
+* **algorithms**: The space-delimited list of signature algorithms supported by the server.
 
 Authorization
 -------------
@@ -150,7 +158,7 @@ The Authorization class represents an "Authorization: Signature" header. It foll
 * **keyId**: The identifier of the key used for signing and verification. If a principal is associated with authentication, it may be included in the keyId value,
 but this specification does not define a method by which a client and server may negotiate the keyId format.
 
-* **headers**: The list of headers in the order used to build the signed request content.
+* **headers**: The space-delimited list of headers in the order used to build the signed request content.
 
 * **algorithm**: The signing algorithm used by the client
 
@@ -159,4 +167,30 @@ but this specification does not define a method by which a client and server may
 
 RequestContent
 --------------
+
+The RequestContent class represents the sign-able portion of an HTTP Request. This includes the request line (as in "GET /some/page.html?foo=bar HTTP/1.1") and all of the request headers, excluding the "Authorization" header.
+
+It is created using the RequestContent.Builder class:
+
+    // example HTTP headers provided by a client implementation
+    Map<String, String> headers = ...
+
+    RequestContent.Builder requestContentBuilder = new RequestContent.Builder();
+
+    requestContentBuilder.setRequestLine("GET /index.html HTTP/1.1");
+
+    for (Map.Entry<String, String> header : headers.entrySet()) {
+        requestContentBuilder.addHeader(header.getKey(), header.getValue());
+    }
+
+    if (requestContentBuilder.build().getDate() == null) {
+        requestContentBuilder.addDateNow();
+
+        String dateValue = requestContentBuilder.build().getDate();
+
+        // add header ("date", dateValue) to client HTTP request...
+    }
+
+    RequestContent requestContent = requestContentBuilder.build();
+
 
