@@ -134,10 +134,28 @@ After parsing an Authorization and building the RequestContent object from the H
 Challenge
 ---------
 
-The Challenge class represents a "WWW-Authenticate: Signature" header. It
+The Challenge class represents a "WWW-Authenticate: Signature" header. It follows the RFC2617 syntax for parameters, the three of which are defined as:
+
+* **realm**: The authentication realm defined by RFC2617
+
+* **headers**: The list of headers that are required in Authorization signatures. The order of these headers is not significant.
+
+* **algorithms**: The list of signature algorithms supported by the server.
 
 Authorization
 -------------
+
+The Authorization class represents an "Authorization: Signature" header. It follows the RFC2617 syntax for parameters, the four of which are defined as:
+
+* **keyId**: The identifier of the key used for signing and verification. If a principal is associated with authentication, it may be included in the keyId value,
+but this specification does not define a method by which a client and server may negotiate the keyId format.
+
+* **headers**: The list of headers in the order used to build the signed request content.
+
+* **algorithm**: The signing algorithm used by the client
+
+* **signature**: The Base64-encoded signature of the request content.
+
 
 RequestContent
 --------------
