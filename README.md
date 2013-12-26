@@ -177,12 +177,16 @@ It is created using the RequestContent.Builder class:
 
     RequestContent.Builder requestContentBuilder = new RequestContent.Builder();
 
+    // set the HTTP request line
     requestContentBuilder.setRequestLine("GET /index.html HTTP/1.1");
 
+    // add each HTTP header in request order
     for (Map.Entry<String, String> header : headers.entrySet()) {
         requestContentBuilder.addHeader(header.getKey(), header.getValue());
     }
 
+    // if the date header is not set, set it to the current time, but remember
+    //   to add the resulting date header back to the original client request
     if (requestContentBuilder.build().getDate() == null) {
         requestContentBuilder.addDateNow();
 
@@ -191,6 +195,7 @@ It is created using the RequestContent.Builder class:
         // add header ("date", dateValue) to client HTTP request...
     }
 
+    // build the request content
     RequestContent requestContent = requestContentBuilder.build();
 
 

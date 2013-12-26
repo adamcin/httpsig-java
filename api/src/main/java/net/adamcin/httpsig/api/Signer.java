@@ -150,10 +150,7 @@ public final class Signer {
             byte[] signature = key.sign(algo, requestContent.getContent(headers, Constants.CHARSET));
 
             if (signature != null) {
-                return new Authorization(
-                        this.keyId.getId(key), Base64.toBase64String(signature), headers, algo,
-                        this.challenge
-                );
+                return new Authorization(this.keyId.getId(key), Base64.toBase64String(signature), headers, algo);
             }
         }
 
