@@ -46,17 +46,54 @@ The Signer is the mechanism used by a client to select a Key from the Keychain, 
 
 To create a Signer, you must provide both a Keychain and a KeyId. For example:
 
-    // The DefaultKeychain class is provided for convenience
     DefaultKeychain keychain = new DefaultKeychain();
 
     // Use PEMUtil from httpsig-ssh-bc to read an SSH private key from a file
-    keychain.add(PEMUtil.readKey(new File("/home/user/.ssh/id_rsa"), null));
+    keychain.add(PEMUtil.readKey(new File("/home/user/.ssh/id_rsa"), "chang3m3"));
 
-    // The UserFingerprintKeyId class is provided by httpsig-ssh-jce to construct
-    // keyIds of the form, "/${username}/${fingerprint}"
+    // The UserFingerprintKeyId class is provided by httpsig-ssh-jce to
+    //   construct keyIds of the form, "/${username}/${fingerprint}"
     Signer signer = new Signer(keychain, new UserFingerprintKeyId("admin"));
 
-For the Signer to select a key...
+A keychain may have 0-to-many keys. The Signer selects a key based on a Challenge. The client triggers this selection by passing a Challenge to the rotateKeys() method.
+
+    Challenge challenge = Challenge.parseChallenge(wwwAuthnValue);
+
+    // Challenge.parseChallenge() may return null if a Signature challenge could not
+    // be parsed from the provided header value.
+    if (challenge != null) {
+
+        // The Signer will rotate the keychain until it finds the first
+        //   signing key that supports the algorithms listed in the Challenge.
+        signer.rotateKeys(challenge);
+    }
+
+After selecting a key and building a RequestContent object, the client signs the content using the Signer.sign(requestContent) method in order to create an Authorization header.
+
+    RequestContent.Builder requestContentBuilder = new RequestContent.Builder();
+
+    // for all request headers, requestContentBuilder.addHeader(name, value)...
+
+    Authorization authz = signer.sign(requestContentBuilder.build());
+
+    // The Signer.sign() method may return null if the request content
+    //   could not be signed.
+    if (authz != null) {
+
+        // add request header "Authorization", authz.getHeaderValue()
+    }
+
+If the subsequent request fails with a 401 Unauthorized / WWW-Authenticate: Signature, the client may rotate the keychain again to discard the invalid key.
+
+    Challenge nextChallenge = Challenge.parseChallenge(wwwAuthnValue);
+
+    // Challenge.parseChallenge() may return null
+    if (nextChallenge != null) {
+
+        // The current key will be discarded if it satisfies nextChallenge
+        //   after failing to authenticate in failedAuthz.
+        signer.rotateKeys(nextChallenge, failedAuthz);
+    }
 
 Verifier
 --------
