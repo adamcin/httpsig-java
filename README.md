@@ -57,12 +57,11 @@ To create a Signer, you must provide both a Keychain and a KeyId. For example:
 
 A keychain may have 0-to-many keys. The Signer selects a key based on a Challenge. The client triggers this selection by passing a Challenge to the rotateKeys() method.
 
-    Challenge challenge = Challenge.parseChallenge(wwwAuthnValue);
+    Challenge challenge = Challenge.parse(wwwAuthnValue);
 
-    // Challenge.parseChallenge() may return null if a Signature challenge could not
-    // be parsed from the provided header value.
+    // Challenge.parse() may return null if a Signature challenge
+    //   could not be parsed from the provided header value.
     if (challenge != null) {
-
         // The Signer will rotate the keychain until it finds the first
         //   signing key that supports the algorithms listed in the Challenge.
         signer.rotateKeys(challenge);
@@ -72,6 +71,7 @@ After selecting a key and building a RequestContent object, the client signs the
 
     RequestContent.Builder requestContentBuilder = new RequestContent.Builder();
 
+    // call requestContentBuilder.setRequestLine(requestLine) then
     // for all request headers, requestContentBuilder.addHeader(name, value)...
 
     Authorization authz = signer.sign(requestContentBuilder.build());
@@ -79,17 +79,15 @@ After selecting a key and building a RequestContent object, the client signs the
     // The Signer.sign() method may return null if the request content
     //   could not be signed.
     if (authz != null) {
-
         // add request header "Authorization", authz.getHeaderValue()
     }
 
 If the subsequent request fails with a 401 Unauthorized / WWW-Authenticate: Signature, the client may rotate the keychain again to discard the invalid key.
 
-    Challenge nextChallenge = Challenge.parseChallenge(wwwAuthnValue);
+    Challenge nextChallenge = Challenge.parse(wwwAuthnValue);
 
-    // Challenge.parseChallenge() may return null
+    // Challenge.parse() may return null
     if (nextChallenge != null) {
-
         // The current key will be discarded if it satisfies nextChallenge
         //   after failing to authenticate in failedAuthz.
         signer.rotateKeys(nextChallenge, failedAuthz);
@@ -100,6 +98,38 @@ Verifier
 
 The Verifier is the mechanism used by a server to verify the signature provided in
 the Authorization header against the Request and the Challenge defined for the server.
+
+To create a Verifier, you must provide a Keychain and a KeyId. For example:
+
+    // The AuthorizedKeys class is provided by httpsig-ssh-jce
+    Keychain keychain = AuthorizedKeys.getDefaultKeychain();
+
+    // The UserFingerprintKeyId class is provided by httpsig-ssh-jce to
+    //   construct keyIds of the form, "/${username}/${fingerprint}"
+    Verifier verifier = new Verifier(keychain, new UserFingerprintKeyId("admin"));
+
+After parsing an Authorization and building the RequestContent object from the HTTP request, the server verifies the Authorization header using Verifier.verify()
+
+    // The challenge is defined by the server.
+    Challenge challenge = ...
+
+    Authorization authz = Authorization.parse(authzValue);
+
+    // Authorization.parse() may return null if a valid Signature Authorization was
+    //   not provided.
+    if (authz != null) {
+        RequestContent.Builder requestContentBuilder = new RequestContent.Builder();
+
+        // call requestContentBuilder.setRequestLine(requestLine) then
+        // for all request headers, requestContentBuilder.addHeader(name, value)
+
+        if (verifier.verify(challenge, requestContentBuilder.build(), authz)) {
+            // handle request after successful authentication
+        }
+    }
+
+    // otherwise, send 401 Unauthorized / WWW-Authenticate: Signature
+
 
 Challenge
 ---------

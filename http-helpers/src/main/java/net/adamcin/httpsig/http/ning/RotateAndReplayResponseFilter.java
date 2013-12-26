@@ -57,7 +57,7 @@ public class RotateAndReplayResponseFilter implements ResponseFilter {
         if (ctx.getResponseStatus().getStatusCode() == 401) {
                         Challenge challenge = null;
             for (String header : ctx.getResponseHeaders().getHeaders().get(Constants.CHALLENGE)) {
-                challenge = Challenge.parseChallenge(header);
+                challenge = Challenge.parse(header);
                 if (challenge != null) {
                     break;
                 }

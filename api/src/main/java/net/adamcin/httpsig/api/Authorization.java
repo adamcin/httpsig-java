@@ -119,25 +119,23 @@ public final class Authorization implements Serializable {
     }
 
     public static Authorization parse(String header) {
-        if (header == null) {
-            return null;
+        if (header != null && header.toLowerCase().startsWith(Constants.SCHEME.toLowerCase())) {
+            Map<String, String> params = Constants.parseRFC2617(header);
+
+            if (params.containsKey(Constants.KEY_ID)
+                    && params.containsKey(Constants.HEADERS)
+                    && params.containsKey(Constants.SIGNATURE)
+                    && params.containsKey(Constants.ALGORITHM)) {
+
+                String keyId = params.get(Constants.KEY_ID);
+                String signature = params.get(Constants.SIGNATURE);
+                String headers = params.get(Constants.HEADERS);
+                String algorithm = params.get(Constants.ALGORITHM);
+
+                return new Authorization(keyId, signature, Constants.parseTokens(headers), Algorithm.forName(algorithm));
+            }
         }
 
-        Map<String, String> params = Constants.parseRFC2617(header);
-
-        if (params.containsKey(Constants.KEY_ID)
-                && params.containsKey(Constants.HEADERS)
-                && params.containsKey(Constants.SIGNATURE)
-                && params.containsKey(Constants.ALGORITHM)) {
-
-            String keyId = params.get(Constants.KEY_ID);
-            String signature = params.get(Constants.SIGNATURE);
-            String headers = params.get(Constants.HEADERS);
-            String algorithm = params.get(Constants.ALGORITHM);
-
-            return new Authorization(keyId, signature, Constants.parseTokens(headers), Algorithm.forName(algorithm));
-        } else {
-            return null;
-        }
+        return null;
     }
 }

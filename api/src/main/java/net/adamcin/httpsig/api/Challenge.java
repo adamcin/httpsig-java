@@ -104,18 +104,20 @@ public final class Challenge implements Serializable {
         return Collections.unmodifiableList(algorithmList);
     }
 
-    public static Challenge parseChallenge(final String challenge) {
-        Map<String, String> params = Constants.parseRFC2617(challenge);
+    public static Challenge parse(final String header) {
+        if (header != null && header.toLowerCase().startsWith(Constants.SCHEME.toLowerCase())) {
+            Map<String, String> params = Constants.parseRFC2617(header);
 
-        if (params.containsKey(Constants.REALM)
-                && params.containsKey(Constants.HEADERS)
-                && params.containsKey(Constants.ALGORITHMS)) {
+            if (params.containsKey(Constants.REALM)
+                    && params.containsKey(Constants.HEADERS)
+                    && params.containsKey(Constants.ALGORITHMS)) {
 
-            String realm = params.get(Constants.REALM);
-            String headers = params.get(Constants.HEADERS);
-            String algorithms = params.get(Constants.ALGORITHMS);
+                String realm = params.get(Constants.REALM);
+                String headers = params.get(Constants.HEADERS);
+                String algorithms = params.get(Constants.ALGORITHMS);
 
-            return new Challenge(realm, Constants.parseTokens(headers), parseAlgorithms(algorithms));
+                return new Challenge(realm, Constants.parseTokens(headers), parseAlgorithms(algorithms));
+            }
         }
 
         return null;
