@@ -27,8 +27,48 @@
 
 package net.adamcin.httpsig.ssh.bc;
 
+import net.adamcin.commons.testing.junit.FailUtil;
+import net.adamcin.httpsig.api.Key;
+import net.adamcin.httpsig.ssh.jce.FingerprintableKey;
+import net.adamcin.httpsig.ssh.jce.KeyFormat;
+import net.adamcin.httpsig.ssh.jce.SSHKey;
+import net.adamcin.httpsig.testutil.KeyTestUtil;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.security.KeyPair;
+
+import static org.junit.Assert.*;
+
 /**
- * Why have I procrastinated on this class?
  */
 public class PEMUtilTest {
+
+    @Test
+    public void testReadKey() {
+        KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("b2048", "id_rsa");
+        SSHKey sshKey = new SSHKey(KeyFormat.SSH_RSA, keyPair);
+
+        try {
+            Key bcKey = PEMUtil.readKey(KeyTestUtil.getPrivateKeyAsFile("b2048", "id_rsa"), null);
+
+            assertEquals("fingerprints should match", sshKey.getFingerprint(), ((FingerprintableKey) bcKey).getFingerprint());
+        } catch (IOException e) {
+            FailUtil.sprintFail(e);
+        }
+    }
+
+    @Test
+    public void testEncryptedKey() {
+        KeyPair keyPair = KeyTestUtil.getKeyPairFromProperties("withpass", "id_rsa");
+        SSHKey sshKey = new SSHKey(KeyFormat.SSH_RSA, keyPair);
+
+        try {
+            Key bcKey = PEMUtil.readKey(KeyTestUtil.getPrivateKeyAsFile("withpass", "id_rsa"), "dummydummy".toCharArray());
+
+            assertEquals("fingerprints should match", sshKey.getFingerprint(), ((FingerprintableKey) bcKey).getFingerprint());
+        } catch (IOException e) {
+            FailUtil.sprintFail(e);
+        }
+    }
 }

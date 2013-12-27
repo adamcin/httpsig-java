@@ -47,6 +47,12 @@ public final class Challenge implements Serializable {
     private final List<String> headers;
     private final List<Algorithm> algorithms;
 
+    /**
+     * Construct a {@link Challenge} instance
+     * @param realm the authentication realm
+     * @param headers the list of required headers
+     * @param algorithms the list of supported algorithms
+     */
     public Challenge(final String realm,
                      final List<String> headers,
                      final Collection<Algorithm> algorithms) {
@@ -67,6 +73,9 @@ public final class Challenge implements Serializable {
         return algorithms;
     }
 
+    /**
+     * @return the constructed value of the WWW-Authenticate header
+     */
     public String getHeaderValue() {
         Map<String, String> params = new LinkedHashMap<String, String>();
         params.put(Constants.REALM, this.realm);
@@ -104,6 +113,11 @@ public final class Challenge implements Serializable {
         return Collections.unmodifiableList(algorithmList);
     }
 
+    /**
+     * Parse a WWW-Authenticate header value to create a {@link Challenge}
+     * @param header WWW-Authenticate header value
+     * @return a {@link Challenge} header
+     */
     public static Challenge parse(final String header) {
         if (header != null && header.toLowerCase().startsWith(Constants.SCHEME.toLowerCase())) {
             Map<String, String> params = Constants.parseRFC2617(header);

@@ -47,11 +47,11 @@ public final class Authorization implements Serializable {
     private final Algorithm algorithm;
 
     /**
-     *
-     * @param keyId
-     * @param signature
-     * @param headers
-     * @param algorithm
+     * Construct an {@link Authorization} instance
+     * @param keyId the key identifier
+     * @param signature the Base64-encoded Signature
+     * @param headers the list of signed headers
+     * @param algorithm the signing algorithm used
      */
     public Authorization(final String keyId, final String signature, final List<String> headers, final Algorithm algorithm) {
         this.keyId = keyId;
@@ -86,6 +86,9 @@ public final class Authorization implements Serializable {
         return algorithm;
     }
 
+    /**
+     * @return the constructed {@link Authorization} header value
+     */
     public String getHeaderValue() {
         Map<String, String> params = new LinkedHashMap<String, String>();
         params.put(Constants.KEY_ID, keyId);
@@ -100,6 +103,11 @@ public final class Authorization implements Serializable {
         return getHeaderValue();
     }
 
+    /**
+     * Parse an Authorization header value to construct an {@link Authorization} instance
+     * @param header the Authorization header value
+     * @return the {@link Authorization} instance
+     */
     public static Authorization parse(String header) {
         if (header != null && header.toLowerCase().startsWith(Constants.SCHEME.toLowerCase())) {
             Map<String, String> params = Constants.parseRFC2617(header);
