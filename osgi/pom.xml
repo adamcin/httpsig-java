@@ -73,10 +73,10 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            net.adamcin.httpsig.api,
-                            net.adamcin.httpsig.ssh.jce,
-                            net.adamcin.httpsig.ssh.bc,
-                            net.adamcin.httpsig.http.*
+                            net.adamcin.httpsig.api;version:=${project.version},
+                            net.adamcin.httpsig.ssh.jce;version:=${project.version},
+                            net.adamcin.httpsig.ssh.bc;version:=${project.version},
+                            net.adamcin.httpsig.http.*;version:=${project.version}
                         </Export-Package>
                         <Import-Package>
                             com.ning.http.*;resolution:=optional,
