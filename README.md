@@ -51,9 +51,9 @@ To create a Signer, you must provide both a Keychain and a KeyId. For example:
     // Use PEMUtil from httpsig-ssh-bc to read an SSH private key from a file
     keychain.add(PEMUtil.readKey(new File("/home/user/.ssh/id_rsa"), "chang3m3"));
 
-    // The UserFingerprintKeyId class is provided by httpsig-ssh-jce to
-    //   construct keyIds of the form, "/${username}/${fingerprint}"
-    Signer signer = new Signer(keychain, new UserFingerprintKeyId("admin"));
+    // The UserKeysFingerprintKeyId class is provided by httpsig-ssh-jce to
+    //   construct keyIds using the Joyent API convention, "/${username}/keys/${fingerprint}"
+    Signer signer = new Signer(keychain, new UserKeysFingerprintKeyId("admin"));
 
 A keychain may have 0-to-many keys. The Signer selects a key based on a Challenge. The client triggers this selection by passing a Challenge to the rotateKeys() method.
 
@@ -104,9 +104,9 @@ To create a Verifier, you must provide a Keychain and a KeyId. For example:
     // The AuthorizedKeys class is provided by httpsig-ssh-jce
     Keychain keychain = AuthorizedKeys.getDefaultKeychain();
 
-    // The UserFingerprintKeyId class is provided by httpsig-ssh-jce to
-    //   construct keyIds of the form, "/${username}/${fingerprint}"
-    Verifier verifier = new Verifier(keychain, new UserFingerprintKeyId("admin"));
+    // The UserKeysFingerprintKeyId class is provided by httpsig-ssh-jce to
+    //   construct keyIds using the Joyent API convention, "/${username}/keys/${fingerprint}"
+    Verifier verifier = new Verifier(keychain, new UserKeysFingerprintKeyId("admin"));
 
 After parsing an Authorization and building the RequestContent object from the HTTP request, the server verifies the Authorization header using Verifier.verify()
 
