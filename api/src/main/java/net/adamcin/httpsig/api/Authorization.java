@@ -56,7 +56,7 @@ public final class Authorization implements Serializable {
     public Authorization(final String keyId, final String signature, final List<String> headers, final Algorithm algorithm) {
         this.keyId = keyId;
         this.signature = signature;
-        this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Collections.<String>emptyList();
+        this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Constants.DEFAULT_HEADERS;
         this.algorithm = algorithm;
     }
 
@@ -113,16 +113,17 @@ public final class Authorization implements Serializable {
             Map<String, String> params = Constants.parseRFC2617(header);
 
             if (params.containsKey(Constants.KEY_ID)
-                    && params.containsKey(Constants.HEADERS)
                     && params.containsKey(Constants.SIGNATURE)
                     && params.containsKey(Constants.ALGORITHM)) {
 
                 String keyId = params.get(Constants.KEY_ID);
                 String signature = params.get(Constants.SIGNATURE);
-                String headers = params.get(Constants.HEADERS);
                 String algorithm = params.get(Constants.ALGORITHM);
 
-                return new Authorization(keyId, signature, Constants.parseTokens(headers), Algorithm.forName(algorithm));
+                // headers are optional. use default headers if undefined
+                String headers = params.get(Constants.HEADERS);
+
+                return new Authorization(keyId, signature, headers != null ? Constants.parseTokens(headers) : Constants.DEFAULT_HEADERS, Algorithm.forName(algorithm));
             }
         }
 

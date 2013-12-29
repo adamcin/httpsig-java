@@ -123,14 +123,14 @@ public final class Challenge implements Serializable {
             Map<String, String> params = Constants.parseRFC2617(header);
 
             if (params.containsKey(Constants.REALM)
-                    && params.containsKey(Constants.HEADERS)
                     && params.containsKey(Constants.ALGORITHMS)) {
 
                 String realm = params.get(Constants.REALM);
-                String headers = params.get(Constants.HEADERS);
                 String algorithms = params.get(Constants.ALGORITHMS);
 
-                return new Challenge(realm, Constants.parseTokens(headers), parseAlgorithms(algorithms));
+                String headers = params.get(Constants.HEADERS);
+
+                return new Challenge(realm, headers != null ? Constants.parseTokens(headers) : Constants.DEFAULT_HEADERS, parseAlgorithms(algorithms));
             }
         }
 

@@ -31,24 +31,25 @@ import net.adamcin.httpsig.api.Key;
 import net.adamcin.httpsig.api.KeyId;
 
 /**
- * Implementation of {@link net.adamcin.httpsig.api.KeyId} which incorporates a username into the keyId string.
+ * Implementation of {@link KeyId} following the Joyent API convention of /$username/keys/$fingerprint
+ * @since 1.0.2
  */
-public final class UserFingerprintKeyId implements KeyId {
-    private String username;
+public final class UserKeysFingerprintKeyId implements KeyId {
 
-    public UserFingerprintKeyId(String username) {
+    private final String username;
+
+    public UserKeysFingerprintKeyId(String username) {
         this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public String getId(Key key) {
         if (key instanceof FingerprintableKey) {
-            return String.format("/%s/%s", username, ((FingerprintableKey) key).getFingerprint());
+            return String.format("/%s/keys/%s", username, ((FingerprintableKey) key).getFingerprint());
         }
         return null;
     }
-
-    public String getUsername() {
-        return this.username;
-    }
-
 }
