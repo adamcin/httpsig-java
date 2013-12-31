@@ -34,6 +34,7 @@ import com.ning.http.client.FluentCaseInsensitiveStringsMap;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilderBase;
 import com.ning.http.client.Response;
+import com.ning.http.client.SignatureCalculator;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.RequestContent;
@@ -55,12 +56,33 @@ public final class AsyncUtil {
      * content will be built according to the last {@link net.adamcin.httpsig.api.Challenge} provided to the
      * {@link Signer#rotateKeys(net.adamcin.httpsig.api.Challenge)} method.
      *
+     * @since 1.0.0
+     *
      * @see #login(com.ning.http.client.AsyncHttpClient, net.adamcin.httpsig.api.Signer, com.ning.http.client.Request)
      * @param client the {@link AsyncHttpClient} to use for
      * @param signer the {@link Signer} to use for authentication. It's keys must be rotated separately.
      */
     public static void enableAuth(final AsyncHttpClient client, final Signer signer) {
-        client.setSignatureCalculator(new AsyncSignatureCalculator(signer));
+        enableAuth(client, signer, null);
+    }
+
+    /**
+     * Attaches the provided {@link Signer} to the {@link AsyncHttpClient} as a signature calculator.
+     * It is expected that key rotation and {@link net.adamcin.httpsig.api.Challenge} management is outside the scope
+     * of this method, so only the {@link net.adamcin.httpsig.api.Keychain#currentKey()} will be used, and signature
+     * content will be built according to the last {@link net.adamcin.httpsig.api.Challenge} provided to the
+     * {@link Signer#rotateKeys(net.adamcin.httpsig.api.Challenge)} method.
+     *
+     * @since 1.0.4
+     *
+     * @see #login(com.ning.http.client.AsyncHttpClient, net.adamcin.httpsig.api.Signer, com.ning.http.client.Request)
+     * @param client the {@link AsyncHttpClient} to use for
+     * @param signer the {@link Signer} to use for authentication. It's keys must be rotated separately.
+     * @param calcBefore provide another {@link SignatureCalculator} to call (such as a Content-MD5 generator) prior to
+     *                   generating the signature for authentication.
+     */
+    public static void enableAuth(final AsyncHttpClient client, final Signer signer, final SignatureCalculator calcBefore) {
+        client.setSignatureCalculator(new AsyncSignatureCalculator(signer, calcBefore));
     }
 
     /**
@@ -90,6 +112,9 @@ public final class AsyncUtil {
      * Executes and replays a login request until one is found which satisfies the
      * {@link net.adamcin.httpsig.api.Challenge} being returned by the server, or until there are no more keys in the
      * keychain.
+     *
+     * @since 1.0.0
+     *
      * @param client the {@link AsyncHttpClient} to which the {@link Signer} will be attached
      * @param signer the {@link Signer} used for login and subsequent signature authentication
      * @param loginRequest the login {@link Request} to be executed and replayed while rotating the keychain
@@ -99,22 +124,48 @@ public final class AsyncUtil {
      * @throws IOException if thrown by a login request
      */
     public static <T> Future<T> login(final AsyncHttpClient client,
+                                      final Signer signer,
+                                      final Request loginRequest,
+                                      AsyncCompletionHandler<T> responseHandler) throws IOException {
+        return login(client, signer, loginRequest, responseHandler, null);
+    }
+
+    /**
+     * Executes and replays a login request until one is found which satisfies the
+     * {@link net.adamcin.httpsig.api.Challenge} being returned by the server, or until there are no more keys in the
+     * keychain.
+     *
+     * @since 1.0.4
+     *
+     * @param client the {@link AsyncHttpClient} to which the {@link Signer} will be attached
+     * @param signer the {@link Signer} used for login and subsequent signature authentication
+     * @param loginRequest the login {@link Request} to be executed and replayed while rotating the keychain
+     * @param responseHandler an {@link AsyncCompletionHandler} of type {@code T}
+     * @param calcBefore provide another {@link SignatureCalculator} to call (such as a Content-MD5 generator) prior to
+     *                   generating the signature for authentication.
+     * @param <T> type parameter for completion handler
+     * @return a {@link Future} of type {@code T}
+     * @throws IOException if thrown by a login request
+     */
+    public static <T> Future<T> login(final AsyncHttpClient client,
                              final Signer signer,
                              final Request loginRequest,
-                             AsyncCompletionHandler<T> responseHandler) throws IOException {
+                             final AsyncCompletionHandler<T> responseHandler,
+                             final SignatureCalculator calcBefore) throws IOException {
 
         final AsyncHttpClientConfig.Builder configBuilder = new AsyncHttpClientConfig.Builder(client.getConfig());
         configBuilder.addResponseFilter(new RotateAndReplayResponseFilter(signer));
         AsyncHttpClient loginClient = new AsyncHttpClient(configBuilder.build());
 
-        enableAuth(loginClient, signer);
+        enableAuth(loginClient, signer, calcBefore);
         Future<T> response = loginClient.executeRequest(loginClient
                                                                 .prepareRequest(loginRequest)
                                                                 .setUrl(loginRequest.getUrl()).build(),
                                                         responseHandler);
-        enableAuth(client, signer);
+        enableAuth(client, signer, calcBefore);
         return response;
     }
+
 
     /**
      * really? really? So much request munging happens after the {@link AsyncSignatureCalculator} is called...
@@ -122,7 +173,7 @@ public final class AsyncUtil {
      * @return
      */
     public static String escapeQueryString(String query) {
-        return query != null ? query.replaceAll("/", "%2F") : "";
+        return query != null ? query.replaceAll("/", "%2F").replaceAll(":", "%3A") : "";
     }
 
     public static String getRequestLine(Request request, String requestLineFormat) {
