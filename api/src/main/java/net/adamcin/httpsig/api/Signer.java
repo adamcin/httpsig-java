@@ -125,12 +125,25 @@ public final class Signer {
     }
 
     /**
-     * Signs a {@link RequestContent} and returns an {@link Authorization} header
+     * Signs a {@link RequestContent} and returns an {@link Authorization} header. The signature will use
+     * all headers included in the {@link RequestContent}.
      *
      * @param requestContent the Request containing the headers to be signed
-     * @return a signed {@link Authorization} header or null if no identities could sign the {@link Challenge}
+     * @return a signed {@link Authorization} header or null if no identities could sign the {@link RequestContent}
      */
     public Authorization sign(RequestContent requestContent) {
+        return sign(requestContent, requestContent.getHeaderNames());
+    }
+
+    /**
+     * Signs a {@link RequestContent} and returns an {@link Authorization} header.
+     *
+     * @param requestContent the Request containing the headers to be signed
+     * @param electiveHeaders a list of headers to include in the signature, beyond those required by
+     *                        the {@link Challenge}
+     * @return a signed {@link Authorization} header or null if no identities could sign the {@link RequestContent}
+     */
+    public Authorization sign(RequestContent requestContent, List<String> electiveHeaders) {
         if (!candidateKeys.isEmpty()) {
             Key key = this.candidateKeys.currentKey();
 
@@ -143,6 +156,9 @@ public final class Signer {
             }
 
             Set<String> signHeaders = new LinkedHashSet<String>();
+            if (electiveHeaders != null) {
+                signHeaders.addAll(electiveHeaders);
+            }
             signHeaders.addAll(challenge.getHeaders());
 
             List<String> headers = new ArrayList<String>(signHeaders);

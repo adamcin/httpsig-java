@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-@Version("1.0.2")
+@Version("1.0.4")
 package net.adamcin.httpsig.api;
 
 import aQute.bnd.annotation.Version;

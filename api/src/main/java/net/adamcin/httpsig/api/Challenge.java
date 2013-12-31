@@ -57,7 +57,7 @@ public final class Challenge implements Serializable {
                      final List<String> headers,
                      final Collection<Algorithm> algorithms) {
         this.realm = realm;
-        this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Constants.DEFAULT_HEADERS;
+        this.headers = headers != null ? Constants.filterHeaders(new ArrayList<String>(headers)) : Constants.DEFAULT_HEADERS;
         this.algorithms = algorithms != null ? Arrays.asList(algorithms.toArray(new Algorithm[algorithms.size()])) : Collections.<Algorithm>emptyList();
     }
 

@@ -56,7 +56,7 @@ public final class Authorization implements Serializable {
     public Authorization(final String keyId, final String signature, final List<String> headers, final Algorithm algorithm) {
         this.keyId = keyId;
         this.signature = signature;
-        this.headers = headers != null ? Collections.unmodifiableList(new ArrayList<String>(headers)) : Constants.DEFAULT_HEADERS;
+        this.headers = headers != null ? Constants.filterHeaders(new ArrayList<String>(headers)) : Constants.DEFAULT_HEADERS;
         this.algorithm = algorithm;
     }
 

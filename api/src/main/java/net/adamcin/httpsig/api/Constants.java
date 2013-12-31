@@ -50,6 +50,7 @@ public final class Constants {
 
     /**
      * Http response header representing a server authentication challenge
+     *
      * @see <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617: HTTP Authentication: Basic and Digest Access Authentication</a>
      */
     public static final String CHALLENGE = "WWW-Authenticate";
@@ -71,7 +72,13 @@ public final class Constants {
     public static final List<String> DEFAULT_HEADERS = Arrays.asList(HEADER_DATE);
 
     /**
+     * List of headers to always exclude from signature calculation, due to potential conflicts with proxies, or
+     */
+    public static final List<String> IGNORE_HEADERS = Arrays.asList("connection", "authorization");
+
+    /**
      * Http request header representing client credentials
+     *
      * @see <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617: HTTP Authentication: Basic and Digest Access Authentication</a>
      */
     public static final String AUTHORIZATION = "Authorization";
@@ -104,7 +111,7 @@ public final class Constants {
     /**
      *
      */
-    public static final Pattern RFC2617_PARAM = Pattern.compile("(^|\\s)(\\w+)=\"([^\"]*)\"");
+    public static final Pattern RFC2617_PARAM = Pattern.compile("(\\w+)=\"([^\"]*)\"");
 
     public static final List<String> parseTokens(String tokens) {
         if (tokens == null || tokens.trim().isEmpty()) {
@@ -131,9 +138,11 @@ public final class Constants {
 
     public static final Map<String, String> parseRFC2617(String header) {
         Map<String, String> params = new HashMap<String, String>();
-        final Matcher matcher = RFC2617_PARAM.matcher(header);
-        while (matcher.find()) {
-            params.put(matcher.group(2), matcher.group(3));
+        if (header != null && header.toLowerCase().startsWith(Constants.SCHEME.toLowerCase())) {
+            final Matcher matcher = RFC2617_PARAM.matcher(header.substring(Constants.SCHEME.length() + 1));
+            while (matcher.find()) {
+                params.put(matcher.group(1), matcher.group(2));
+            }
         }
         return Collections.unmodifiableMap(params);
     }
@@ -149,13 +158,32 @@ public final class Constants {
         return sb.toString();
     }
 
+    public static List<String> filterHeaders(List<String> headers) {
+        if (headers == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> _headers = new ArrayList<String>(headers.size());
+        for (String header : headers) {
+            if (!IGNORE_HEADERS.contains(header.toLowerCase())) {
+                _headers.add(header.toLowerCase());
+            }
+        }
+
+        return Collections.unmodifiableList(_headers);
+    }
+
     public static final KeyId DEFAULT_KEY_IDENTIFIER = new KeyId() {
-        public String getId(Key key) { return key.getId(); }
+        public String getId(Key key) {
+            return key.getId();
+        }
     };
 
     public static final Collection<Algorithm> ALL_SUPPORTED_ALGORITHMS = Arrays.asList(Algorithm.values());
 
-    public static final Challenge PREEMPTIVE_CHALLENGE = new Challenge("<preemptive>", DEFAULT_HEADERS, ALL_SUPPORTED_ALGORITHMS);
+    public static final Challenge PREEMPTIVE_CHALLENGE = new Challenge(
+            "<preemptive>", DEFAULT_HEADERS, ALL_SUPPORTED_ALGORITHMS
+    );
 
     private Constants() {
     }

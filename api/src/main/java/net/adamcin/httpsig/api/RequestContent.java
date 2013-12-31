@@ -73,14 +73,15 @@ public final class RequestContent implements Serializable {
 
         /**
          * Adds a header name and value pair
+         *
          * @param name
          * @param value
          * @return
          */
         public Builder addHeader(final String name, final String value) {
             final String _name = name.toLowerCase();
-            if (_name.equals(Constants.AUTHORIZATION.toLowerCase()) || _name.startsWith(":")) {
-            /* skip authorization headers and names which begin with a colon */
+            if (Constants.IGNORE_HEADERS.contains(_name) || _name.startsWith(":")) {
+                /* skip ignored headers and names which begin with a colon */
                 return this;
             } else if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
                 return this;
@@ -104,6 +105,7 @@ public final class RequestContent implements Serializable {
          * IMPORTANT: If you call this overload instead of {@link #addHeader(String, String)}, be sure to retrieve the
          * generated header value to add to your client request using a subsequent call to {@link #getDate()}. This is
          * merely a convenience method to generate a date header in the correct format.
+         *
          * @param calendar the Calendar to provide
          * @return true if the date header was successfully set. false if date is already set
          */
@@ -120,6 +122,7 @@ public final class RequestContent implements Serializable {
          * IMPORTANT: If you call this overload instead of {@link #addHeader(String, String)}, be sure to retrieve the
          * generated header value to add to your client request using a subsequent call to {@link #getDate()}. This is
          * merely a convenience method to generate a date header in the correct format.
+         *
          * @param dateGMT the current date in GMT
          * @return this {@link Builder}
          */
@@ -136,6 +139,7 @@ public final class RequestContent implements Serializable {
          * IMPORTANT: If you call this overload instead of {@link #addHeader(String, String)}, be sure to retrieve the
          * generated header value to add to your client request using a subsequent call to {@link #getDate()}. This is
          * merely a convenience method to generate a date header in the correct format.
+         *
          * @return this {@link Builder}
          */
         public Builder addDateNow() {
@@ -150,6 +154,7 @@ public final class RequestContent implements Serializable {
 
     /**
      * Returns the signature content as a byte array
+     *
      * @param headers the list of headers to be included in the signed content
      * @return the result of {@link #getContentString(java.util.List)} encoded using the provided {@link Charset}
      */
@@ -159,6 +164,7 @@ public final class RequestContent implements Serializable {
 
     /**
      * Returns the signature content as a String
+     *
      * @param headers the list of headers to be included in the signed content
      * @return
      */
@@ -167,13 +173,15 @@ public final class RequestContent implements Serializable {
         if (headers != null) {
             for (String header : headers) {
                 String _header = header.toLowerCase();
-                if (Constants.HEADER_REQUEST_LINE.equals(_header)) {
-                    if (this.requestLine != null) {
-                        hashBuilder.append(this.requestLine).append("\n");
-                    }
-                } else {
-                    for (String value : this.getHeaderValues(_header)) {
-                        hashBuilder.append(_header).append(": ").append(value).append("\n");
+                if (!Constants.IGNORE_HEADERS.contains(_header) && !_header.startsWith(":")) {
+                    if (Constants.HEADER_REQUEST_LINE.equals(_header)) {
+                        if (this.requestLine != null) {
+                            hashBuilder.append(this.requestLine).append("\n");
+                        }
+                    } else {
+                        for (String value : this.getHeaderValues(_header)) {
+                            hashBuilder.append(_header).append(": ").append(value).append("\n");
+                        }
                     }
                 }
             }
@@ -188,7 +196,7 @@ public final class RequestContent implements Serializable {
 
     /**
      * @return the list of header names contained in this {@link RequestContent}, in the order in which they were added, except
-     * for request-line, which is listed first if present
+     *         for request-line, which is listed first if present
      */
     public List<String> getHeaderNames() {
         List<String> headerNames = new ArrayList<String>();
@@ -222,7 +230,9 @@ public final class RequestContent implements Serializable {
     public List<String> getHeaderValues(String name) {
         String _name = name.toLowerCase();
         if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
-            return this.requestLine != null ? Collections.singletonList(this.requestLine) : Collections.<String>emptyList();
+            return this.requestLine != null ? Collections.singletonList(
+                    this.requestLine
+            ) : Collections.<String>emptyList();
         } else if (this.headers.containsKey(_name)) {
             return Collections.unmodifiableList(this.headers.get(_name));
         } else {
@@ -232,6 +242,7 @@ public final class RequestContent implements Serializable {
 
     /**
      * Sets the literal date header value.
+     *
      * @param date a date string conforming to {@link #DATE_FORMAT}
      * @return true if the date header was set successfully. false if the header is already set or the provided
      *         string does not conform to {@link #DATE_FORMAT}
@@ -252,6 +263,7 @@ public final class RequestContent implements Serializable {
 
     /**
      * Returns the currently set date header value converted to a {@link Date} object in the GMT time zone
+     *
      * @return a {@link Date} object in GMT or null if header is not set or not valid
      */
     public Date getDateGMT() {
@@ -270,6 +282,7 @@ public final class RequestContent implements Serializable {
     /**
      * Returns the currently set date header value converted to a {@link Calendar} in the specified timeZone, or in the
      * default timeZone if the parameter is null
+     *
      * @param timeZone some time zone or null to convert to the default time zone
      * @return a {@link Calendar} in the specified time zone or in the default time zone if the timeZone parameter is null
      */
