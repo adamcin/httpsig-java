@@ -34,6 +34,7 @@ import net.adamcin.httpsig.api.KeyId;
 import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.RequestContent;
 import net.adamcin.httpsig.api.Verifier;
+import net.adamcin.httpsig.api.VerifyResult;
 import net.adamcin.httpsig.http.servlet.ServletUtil;
 import net.adamcin.httpsig.ssh.jce.AuthorizedKeys;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
@@ -183,12 +184,13 @@ public abstract class HttpServerTestBody extends TestBody {
                 Verifier verifier = new Verifier(this.getKeychain(), this.keyId);
                 RequestContent sigBuilder = ServletUtil.getRequestContent(req);
 
-                if (true) {
-                    LOGGER.info("[handleAuthentication] sigBuilder: {}", sigBuilder);
-                }
-
-                if (verifier.verify(getChallenge(), sigBuilder, authorization)) {
+                VerifyResult result = verifier.verifyWithResult(getChallenge(), sigBuilder, authorization);
+                if (result == VerifyResult.SUCCESS) {
                     return false;
+                } else {
+                    LOGGER.info("[handleAuthentication] VerifyResult: {}", result);
+                    LOGGER.info("[handleAuthentication] Authorization: {}", authorization);
+                    LOGGER.info("[handleAuthentication] RequestContent: {}", sigBuilder);
                 }
             }
 
