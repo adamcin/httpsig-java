@@ -199,3 +199,4 @@ It is created using the RequestContent.Builder class:
     RequestContent requestContent = requestContentBuilder.build();
 
 
+[![Analytics](https://ga-beacon.appspot.com/UA-XXXXX-X/httpsig-java/)](https://github.com/igrigorik/ga-beacon)
