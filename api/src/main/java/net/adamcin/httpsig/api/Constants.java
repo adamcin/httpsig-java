@@ -72,9 +72,9 @@ public final class Constants {
     public static final List<String> DEFAULT_HEADERS = Arrays.asList(HEADER_DATE);
 
     /**
-     * List of headers to always exclude from signature calculation, due to potential conflicts with proxies, or
+     * List of headers to always exclude from signature calculation
      */
-    public static final List<String> IGNORE_HEADERS = Arrays.asList("connection", "authorization");
+    public static final List<String> IGNORE_HEADERS = Arrays.asList("authorization");
 
     /**
      * Http request header representing client credentials

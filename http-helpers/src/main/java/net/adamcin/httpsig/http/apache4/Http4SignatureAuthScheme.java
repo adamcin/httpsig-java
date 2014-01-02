@@ -86,7 +86,11 @@ public final class Http4SignatureAuthScheme extends RFC2617Scheme {
             sigBuilder.setRequestLine(request.getRequestLine().toString());
 
             for (Header header : request.getAllHeaders()) {
-                sigBuilder.addHeader(header.getName(), header.getValue());
+                if (header.getName().toLowerCase().equals("connection")) {
+                    sigBuilder.addHeader("connection", header.getValue().toLowerCase());
+                } else {
+                    sigBuilder.addHeader(header.getName(), header.getValue());
+                }
             }
 
             if (sigBuilder.build().getDate() == null) {
@@ -103,4 +107,5 @@ public final class Http4SignatureAuthScheme extends RFC2617Scheme {
 
         return null;
     }
+
 }
