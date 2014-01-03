@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-@Version("1.0.2")
-package net.adamcin.httpsig.http.apache4;
+@Version("${package-info.version}")
+package net.adamcin.httpsig.http.apache3;
 
 import aQute.bnd.annotation.Version;

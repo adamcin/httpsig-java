@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-@Version("1.0.2")
-package net.adamcin.httpsig.ssh.bc;
+@Version("${package-info.version}")
+package net.adamcin.httpsig.testutil;
 
 import aQute.bnd.annotation.Version;
