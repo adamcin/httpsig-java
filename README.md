@@ -1,6 +1,8 @@
 httpsig-java
 ============
 
+[![Build Status](https://travis-ci.org/adamcin/httpsig-java.png)](https://travis-ci.org/adamcin/httpsig-java])
+
 Implementation of Joyent's [HTTP Signature Authentication](https://github.com/joyent/node-http-signature/blob/master/http_signing.md) in Java
 
 Introduction
