@@ -70,6 +70,19 @@ public final class Verifier {
     }
 
     /**
+     * Selects an appropriate {@link Key} from the {@link Keychain} matching the keyId specified in the
+     * {@link Authorization}. This method is called by
+     * {@link #verifyWithResult(Challenge, RequestContent, Authorization)}, but can be called by client code to
+     * retrieve the identified {@link Key} directly
+     * @since 1.0.6
+     * @param authorization the {@link Authorization} header
+     * @return a matching {@link Key} or null
+     */
+    public Key selectKey(Authorization authorization) {
+        return keychain.toMap(this.keyId).get(authorization.getKeyId());
+    }
+
+    /**
      * Verifies the provided {@link Authorization} header against the original {@link Challenge}
      * @param challenge the WWW-Authenticate challenge sent to the client in the previous response
      * @param requestContent the {@link RequestContent} containing the request header content
@@ -125,7 +138,7 @@ public final class Verifier {
             }
         }
 
-        Key key = keychain.toMap(this.keyId).get(authorization.getKeyId());
+        Key key = selectKey(authorization);
         if (key == null) {
             return VerifyResult.KEY_NOT_FOUND;
         }
