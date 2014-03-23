@@ -39,9 +39,9 @@
     <artifactId>net.adamcin.httpsig.osgi</artifactId>
     <packaging>bundle</packaging>
 
-	<name>${project.artifactId}</name>
+	<name>HTTP Signature Authentication Support Bundle</name>
     <description>
-		OSGi Bundle exporting the core HTTP signature API, JCE and BouncyCastle implementations, and helper classes
+		OSGi Bundle exporting the core HTTP signature API, JCE and BouncyCastle implementations, and helper classes.
     </description>
 
 	<inceptionYear>2013</inceptionYear>
@@ -68,6 +68,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>
                             net.adamcin.httpsig.api,
                             net.adamcin.httpsig.ssh.jce,
