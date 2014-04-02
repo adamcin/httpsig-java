@@ -31,7 +31,6 @@ import net.adamcin.httpsig.api.Base64;
 import net.adamcin.httpsig.api.DefaultKeychain;
 import net.adamcin.httpsig.api.Key;
 import net.adamcin.httpsig.api.Keychain;
-import net.adamcin.httpsig.api.Verifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +58,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * Factory methods for creating {@link Verifier} instances around SSH authorized_keys files
+ * Factory methods for creating {@link net.adamcin.httpsig.api.DefaultVerifier} instances around SSH authorized_keys files
  */
 public final class AuthorizedKeys {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizedKeys.class);

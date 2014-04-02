@@ -169,12 +169,20 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
     }
 
     public Map<String, Key> toMap(KeyId keyIdentifier) {
-        KeyId identifier = keyIdentifier != null ? keyIdentifier : Constants.DEFAULT_KEY_IDENTIFIER;
         LinkedHashMap<String, Key> map = new LinkedHashMap<String, Key>(this.size());
-        for (Key key : this) {
-            String keyId = identifier.getId(key);
-            if (keyId != null) {
-                map.put(keyId, key);
+        if (keyIdentifier == null) {
+            for (Key key : this) {
+                String keyId = Constants.DEFAULT_KEY_IDENTIFIER.getId(key);
+                if (keyId != null) {
+                    map.put(keyId, key);
+                }
+            }
+        } else {
+            for (Key key : this) {
+                String keyId = keyIdentifier.getId(key);
+                if (keyId != null) {
+                    map.put(keyId, key);
+                }
             }
         }
         return Collections.unmodifiableMap(map);

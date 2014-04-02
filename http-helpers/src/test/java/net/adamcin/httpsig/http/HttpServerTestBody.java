@@ -30,10 +30,10 @@ package net.adamcin.httpsig.http;
 import net.adamcin.commons.testing.junit.TestBody;
 import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;
+import net.adamcin.httpsig.api.DefaultVerifier;
 import net.adamcin.httpsig.api.KeyId;
 import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.RequestContent;
-import net.adamcin.httpsig.api.Verifier;
 import net.adamcin.httpsig.api.VerifyResult;
 import net.adamcin.httpsig.http.servlet.ServletUtil;
 import net.adamcin.httpsig.ssh.jce.AuthorizedKeys;
@@ -181,7 +181,7 @@ public abstract class HttpServerTestBody extends TestBody {
 
             Authorization authorization = ServletUtil.getAuthorization(req);
             if (authorization != null) {
-                Verifier verifier = new Verifier(this.getKeychain(), this.keyId);
+                DefaultVerifier verifier = new DefaultVerifier(this.getKeychain(), this.keyId);
                 RequestContent sigBuilder = ServletUtil.getRequestContent(req);
 
                 VerifyResult result = verifier.verifyWithResult(getChallenge(), sigBuilder, authorization);

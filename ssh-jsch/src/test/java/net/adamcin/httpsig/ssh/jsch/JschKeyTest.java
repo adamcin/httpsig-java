@@ -33,10 +33,10 @@ import net.adamcin.httpsig.api.Authorization;
 import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
+import net.adamcin.httpsig.api.DefaultVerifier;
 import net.adamcin.httpsig.api.Keychain;
 import net.adamcin.httpsig.api.RequestContent;
 import net.adamcin.httpsig.api.Signer;
-import net.adamcin.httpsig.api.Verifier;
 import net.adamcin.httpsig.ssh.jce.AuthorizedKeys;
 import net.adamcin.httpsig.ssh.jce.KeyFormat;
 import net.adamcin.httpsig.ssh.jce.SSHKey;
@@ -79,7 +79,7 @@ public class JschKeyTest {
 
         final String id = "[" + parentName + "/" + keyName + "] ";
 
-        Verifier dverifier = new Verifier(AuthorizedKeys.newKeychain(KeyTestUtil.getPublicKeyAsFile(parentName, keyName)));
+        DefaultVerifier dverifier = new DefaultVerifier(AuthorizedKeys.newKeychain(KeyTestUtil.getPublicKeyAsFile(parentName, keyName)));
         String fingerprint = dverifier.getKeychain().currentKey().getId();
 
         Challenge challenge = new Challenge("myRealm", Constants.DEFAULT_HEADERS, format.getSignatureAlgorithms());
@@ -94,7 +94,7 @@ public class JschKeyTest {
         assertEquals(id + "fingerprints should match", fingerprint, sprovider.iterator().next().getId());
 
         Signer jsigner = new Signer(sprovider);
-        Verifier jverifier = new Verifier(sprovider);
+        DefaultVerifier jverifier = new DefaultVerifier(sprovider);
         RequestContent requestContent = new RequestContent.Builder().addDateNow().build();
 
         Signer dsigner = new Signer(new DefaultKeychain(

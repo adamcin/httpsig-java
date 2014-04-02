@@ -113,7 +113,7 @@ public final class Constants {
      */
     public static final Pattern RFC2617_PARAM = Pattern.compile("(\\w+)=\"([^\"]*)\"");
 
-    public static final List<String> parseTokens(String tokens) {
+    public static List<String> parseTokens(String tokens) {
         if (tokens == null || tokens.trim().isEmpty()) {
             return Collections.emptyList();
         } else {
@@ -126,7 +126,7 @@ public final class Constants {
         }
     }
 
-    public static final String constructTokensString(List<String> tokens) {
+    public static String constructTokensString(List<String> tokens) {
         StringBuilder sb = new StringBuilder();
         if (tokens != null) {
             for (String token : tokens) {
@@ -136,7 +136,7 @@ public final class Constants {
         return sb.toString();
     }
 
-    public static final Map<String, String> parseRFC2617(String header) {
+    public static Map<String, String> parseRFC2617(String header) {
         Map<String, String> params = new HashMap<String, String>();
         if (header != null && header.toLowerCase().startsWith(Constants.SCHEME.toLowerCase())) {
             final Matcher matcher = RFC2617_PARAM.matcher(header.substring(Constants.SCHEME.length() + 1));
@@ -147,7 +147,7 @@ public final class Constants {
         return Collections.unmodifiableMap(params);
     }
 
-    public static final String constructRFC2617(Map<String, String> params) {
+    public static String constructRFC2617(Map<String, String> params) {
         StringBuilder sb = new StringBuilder(SCHEME);
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, String> param : params.entrySet()) {

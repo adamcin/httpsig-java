@@ -41,12 +41,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Helper methods for use in a Servlet context.
  */
 public final class ServletUtil {
 
     private ServletUtil() {
     }
 
+    /**
+     * Parse an {@link javax.servlet.http.HttpServletRequest} to create an {@link net.adamcin.httpsig.api.Authorization}
+     * @param request the HTTP Request
+     * @return the {@link Authorization}
+     */
     public static Authorization getAuthorization(HttpServletRequest request) {
         Enumeration headerValues = request.getHeaders(Constants.AUTHORIZATION);
         while (headerValues.hasMoreElements()) {
@@ -60,10 +66,21 @@ public final class ServletUtil {
         return null;
     }
 
+    /**
+     * Parse an {@link javax.servlet.http.HttpServletRequest} to build the {@link net.adamcin.httpsig.api.RequestContent}
+     * @param request the HTTP Request
+     * @return the {@link net.adamcin.httpsig.api.RequestContent}
+     */
     public static RequestContent getRequestContent(HttpServletRequest request) {
         return getRequestContent(request, null);
     }
 
+    /**
+     * Parse an {@link javax.servlet.http.HttpServletRequest} to build the {@link net.adamcin.httpsig.api.RequestContent}
+     * @param request the HTTP Request
+     * @param ignoreHeaders a collection of header names to ignore, in case they have been added by proxies
+     * @return
+     */
     public static RequestContent getRequestContent(HttpServletRequest request, Collection<String> ignoreHeaders) {
         final Set<String> _ignore = new HashSet<String>();
 
@@ -99,6 +116,14 @@ public final class ServletUtil {
         return signatureContent.build();
     }
 
+    /**
+     * Handle an {@link javax.servlet.http.HttpServletResponse} which has failed authentication by sending a
+     * {@link net.adamcin.httpsig.api.Challenge} header
+     * @param resp the HTTP Response
+     * @param challenge the Server challenge parameters
+     * @return true if response was flushed successfully, false otherwise
+     * @throws IOException if anything went wrong
+     */
     public static boolean sendChallenge(HttpServletResponse resp, Challenge challenge) throws IOException {
         if (!resp.isCommitted()) {
             resp.resetBuffer();

@@ -35,7 +35,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-public class VerifierTest {
+public class DefaultVerifierTest {
 
     @Test
     public void testVerify() {
@@ -44,9 +44,9 @@ public class VerifierTest {
                 String fingerprint = "fingerprint";
 
                 Keychain identities = new MockKeychain(fingerprint);
-                Verifier v = new Verifier(identities);
+                DefaultVerifier v = new DefaultVerifier(identities);
                 RequestContent requestContent = new RequestContent.Builder().addDateNow().build();
-                Challenge c = new Challenge(VerifierTest.class.getName(), Constants.DEFAULT_HEADERS, Arrays.asList( Algorithm.SSH_RSA ));
+                Challenge c = new Challenge(DefaultVerifierTest.class.getName(), Constants.DEFAULT_HEADERS, Arrays.asList( Algorithm.SSH_RSA ));
 
                 byte[] content = requestContent.getContent(Constants.DEFAULT_HEADERS, Constants.CHARSET);
                 Authorization a = new Authorization(fingerprint, MockKey.mockSignBase64(content), Constants.DEFAULT_HEADERS, Algorithm.SSH_RSA);

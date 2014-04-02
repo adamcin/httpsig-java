@@ -33,10 +33,10 @@ import net.adamcin.httpsig.api.Base64;
 import net.adamcin.httpsig.api.Challenge;
 import net.adamcin.httpsig.api.Constants;
 import net.adamcin.httpsig.api.DefaultKeychain;
+import net.adamcin.httpsig.api.DefaultVerifier;
 import net.adamcin.httpsig.api.Key;
 import net.adamcin.httpsig.api.RequestContent;
 import net.adamcin.httpsig.api.Signer;
-import net.adamcin.httpsig.api.Verifier;
 import net.adamcin.httpsig.ssh.jce.AuthorizedKeys.AuthorizedKey;
 import net.adamcin.httpsig.ssh.jce.AuthorizedKeys.PublicPair;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
@@ -161,8 +161,8 @@ public class AuthorizedKeysTest {
             DefaultKeychain verifying = new DefaultKeychain(Arrays.asList(akKey));
 
             Signer signer = new Signer(signingAndVerifying);
-            Verifier sameKeyVerifier = new Verifier(signingAndVerifying);
-            Verifier publicKeyVerifier = new Verifier(verifying);
+            DefaultVerifier sameKeyVerifier = new DefaultVerifier(signingAndVerifying);
+            DefaultVerifier publicKeyVerifier = new DefaultVerifier(verifying);
             RequestContent requestContent = new RequestContent.Builder().addDateNow().build();
 
             final String realm = getClass().getName();
