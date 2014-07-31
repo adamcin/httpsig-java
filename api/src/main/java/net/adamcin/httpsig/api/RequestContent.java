@@ -196,7 +196,7 @@ public final class RequestContent implements Serializable {
 
     /**
      * @return the list of header names contained in this {@link RequestContent}, in the order in which they were added, except
-     *         for request-line, which is listed first if present
+     *         for request-target, which is listed first if present
      */
     public List<String> getHeaderNames() {
         List<String> headerNames = new ArrayList<String>();
@@ -209,7 +209,7 @@ public final class RequestContent implements Serializable {
 
 
     /**
-     * @return the request-line if set
+     * @return the request-target if set
      */
     public String getRequestLine() {
         return requestLine;

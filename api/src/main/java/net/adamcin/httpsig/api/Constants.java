@@ -65,7 +65,7 @@ public final class Constants {
      */
     public static final String KEY_ID = "keyId";
 
-    public static final String HEADER_REQUEST_LINE = "request-line";
+    public static final String HEADER_REQUEST_LINE = "request-target";
 
     public static final String HEADER_DATE = "date";
 
