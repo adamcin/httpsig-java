@@ -73,7 +73,7 @@ After selecting a key and building a RequestContent object, the client signs the
 
     RequestContent.Builder requestContentBuilder = new RequestContent.Builder();
 
-    // call requestContentBuilder.setRequestLine(requestLine) then
+    // call requestContentBuilder.setRequestTarget(method, path) then
     // for all request headers, requestContentBuilder.addHeader(name, value)...
 
     Authorization authz = signer.sign(requestContentBuilder.build());
@@ -122,7 +122,7 @@ After parsing an Authorization and building the RequestContent object from the H
     if (authz != null) {
         RequestContent.Builder requestContentBuilder = new RequestContent.Builder();
 
-        // call requestContentBuilder.setRequestLine(requestLine) then
+        // call requestContentBuilder.setRequestTarget(method, path) then
         // for all request headers, requestContentBuilder.addHeader(name, value)
 
         if (verifier.verify(challenge, requestContentBuilder.build(), authz)) {
@@ -170,7 +170,7 @@ but this specification does not define a method by which a client and server may
 RequestContent
 --------------
 
-The RequestContent class represents the sign-able portion of an HTTP Request. This includes the request line (as in "GET /some/page.html?foo=bar HTTP/1.1") and all of the request headers, excluding the "Authorization" header.
+The RequestContent class represents the sign-able portion of an HTTP Request. This includes the request target (as in "GET /some/page.html?foo=bar") and all of the request headers, excluding the "Authorization" header.
 
 It is created using the RequestContent.Builder class:
 
@@ -179,8 +179,8 @@ It is created using the RequestContent.Builder class:
 
     RequestContent.Builder requestContentBuilder = new RequestContent.Builder();
 
-    // set the HTTP request line
-    requestContentBuilder.setRequestLine("GET /index.html HTTP/1.1");
+    // set the HTTP request target
+    requestContentBuilder.setRequestTarget("GET", "/index.html");
 
     // add each HTTP header in request order
     for (Map.Entry<String, String> header : headers.entrySet()) {
