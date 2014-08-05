@@ -32,15 +32,7 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -49,7 +41,17 @@ import java.util.logging.Logger;
  */
 public final class RequestContent implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(RequestContent.class.getName());
+
+    /**
+     * The official format of the Date header value (and other date-type headers) is defined by
+     * RFC 1123 ({@link #DATE_FORMAT_RFC1123})
+     */
+    @Deprecated
     public static final String DATE_FORMAT = "EEE MMM d HH:mm:ss yyyy zzz";
+
+    public static final String DATE_FORMAT_RFC1123 = "EEE, dd MMM yyyy HH:mm:ss zzz";
+
+    private static final List<String> SUPPORTED_DATE_FORMATS = Arrays.asList(DATE_FORMAT_RFC1123, DATE_FORMAT);
 
     private static final long serialVersionUID = -2968642080214687631L;
 
@@ -77,14 +79,13 @@ public final class RequestContent implements Serializable {
 
         @Deprecated
         public Builder setRequestLine(String requestLine) {
-            LOGGER.warning("[setRequestLine] Use of the request-line header is deprecated. Please use (request-target) instead.");
             this.requestLine = requestLine;
             return this;
         }
 
         public Builder setRequestTarget(String method, String path) {
-            this.method = method.toUpperCase();
-            this.path = path;
+            this.method = method != null ? method.trim().toUpperCase() : null;
+            this.path = path != null ? path.trim() : null;
             return this;
         }
 
@@ -96,23 +97,28 @@ public final class RequestContent implements Serializable {
          * @return
          */
         public Builder addHeader(final String name, final String value) {
-            final String _name = name.toLowerCase();
-            if (Constants.IGNORE_HEADERS.contains(_name) || _name.startsWith(":")) {
+            if (value != null) {
+                final String _value = value.trim();
+                final String _name = name.trim().toLowerCase();
+                if (Constants.IGNORE_HEADERS.contains(_name) || _name.startsWith(":")) {
                 /* skip ignored headers and names which begin with a colon */
-                return this;
-            } else if (Constants.HEADER_REQUEST_TARGET.equals(_name)) {
-                return this;
-            } else if (!Constants.HEADER_DATE.equals(_name) || tryParseDate(value)) {
-                List<String> values = null;
-                if (headers.containsKey(_name)) {
-                    headers.get(_name);
-                } else {
-                    values = new ArrayList<String>();
-                    headers.put(_name, values);
-                }
+                    return this;
+                } else if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
+                    return this;
+                } else if (Constants.HEADER_REQUEST_TARGET.equals(_name)) {
+                    return this;
+                } else if (!Constants.HEADER_DATE.equals(_name) || tryParseDate(_value) != null) {
+                    List<String> values = null;
+                    if (headers.containsKey(_name)) {
+                        headers.get(_name);
+                    } else {
+                        values = new ArrayList<String>();
+                        headers.put(_name, values);
+                    }
 
-                if (values != null) {
-                    values.add(value);
+                    if (values != null) {
+                        values.add(_value);
+                    }
                 }
             }
             return this;
@@ -128,7 +134,7 @@ public final class RequestContent implements Serializable {
          */
         public Builder addDate(Calendar calendar) {
             if (calendar != null) {
-                DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+                DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC1123);
                 dateFormat.setTimeZone(calendar.getTimeZone());
                 this.addHeader(Constants.HEADER_DATE, dateFormat.format(calendar.getTime()));
             }
@@ -186,18 +192,22 @@ public final class RequestContent implements Serializable {
      * @return
      */
     public String getContentString(List<String> headers) {
-        StringBuilder hashBuilder = new StringBuilder("");
+        StringBuilder hashBuilder = new StringBuilder();
         if (headers != null) {
             for (String header : headers) {
                 String _header = header.toLowerCase();
                 if (!Constants.IGNORE_HEADERS.contains(_header) && !_header.startsWith(":")) {
-                    if (Constants.HEADER_REQUEST_TARGET.equals(_header)) {
+                    if (Constants.HEADER_REQUEST_LINE.equals(_header)) {
+                        if (this.requestLine != null) {
+                            hashBuilder.append(this.requestLine).append('\n');
+                        }
+                    } else if (Constants.HEADER_REQUEST_TARGET.equals(_header)) {
                         if (this.getRequestTarget() != null) {
-                            hashBuilder.append(this.getRequestTarget()).append("\n");
+                            hashBuilder.append(this.getRequestTarget()).append('\n');
                         }
                     } else {
                         for (String value : this.getHeaderValues(_header)) {
-                            hashBuilder.append(_header).append(": ").append(value).append("\n");
+                            hashBuilder.append(_header).append(": ").append(value).append('\n');
                         }
                     }
                 }
@@ -223,7 +233,6 @@ public final class RequestContent implements Serializable {
         headerNames.addAll(this.headers.keySet());
         return Collections.unmodifiableList(headerNames);
     }
-
 
     /**
      * @return the request-line if set
@@ -258,7 +267,12 @@ public final class RequestContent implements Serializable {
      */
     public List<String> getHeaderValues(String name) {
         String _name = name.toLowerCase();
-        if (Constants.HEADER_REQUEST_TARGET.equals(_name)) {
+        if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
+            LOGGER.warning("[getHeaderValues] Use of the request-line header is deprecated. Please use (request-target) instead.");
+            return this.requestLine != null ? Collections.singletonList(
+                    this.requestLine
+            ) : Collections.<String>emptyList();
+        } else if (Constants.HEADER_REQUEST_TARGET.equals(_name)) {
             return this.getRequestTarget() != null ? Collections.singletonList(
                     this.getRequestTarget()
             ) : Collections.<String>emptyList();
@@ -272,23 +286,25 @@ public final class RequestContent implements Serializable {
     /**
      * Sets the literal date header value.
      *
-     * @param date a date string conforming to {@link #DATE_FORMAT}
+     * @param date a date string conforming to {@link #DATE_FORMAT_RFC1123} or to the deprecated {@link #DATE_FORMAT}
      * @return true if the date header was set successfully. false if the header is already set or the provided
-     *         string does not conform to {@link #DATE_FORMAT}
+     *         string does not conform to {@link #DATE_FORMAT_RFC1123} or to {@link #DATE_FORMAT}
      */
-    private static boolean tryParseDate(String date) {
+    protected static Date tryParseDate(String date) {
         if (date != null) {
-            try {
-                DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-                dateFormat.parse(date);
-                return true;
-            } catch (ParseException e) {
-                LOGGER.warning("[addDate] date string " + date + " does not match format " + DATE_FORMAT);
+
+            for (String formatString : SUPPORTED_DATE_FORMATS) {
+                try {
+                    DateFormat dateFormat = new SimpleDateFormat(formatString);
+                    dateFormat.setTimeZone(getGMT());
+                    return dateFormat.parse(date);
+                } catch (ParseException e) {
+                    LOGGER.warning("[tryParseDate] date string " + date + " does not match format " + formatString);
+                }
             }
         }
-        return false;
+        return null;
     }
-
 
     /**
      * Returns the currently set date header value converted to a {@link Date} object in the GMT time zone
@@ -297,13 +313,7 @@ public final class RequestContent implements Serializable {
      */
     public Date getDateGMT() {
         if (this.getDate() != null) {
-            try {
-                DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-                dateFormat.setTimeZone(getGMT());
-                return dateFormat.parse(this.getDate());
-            } catch (ParseException e) {
-                LOGGER.warning("[getDateGMT] date string " + this.getDate() + " does not match format " + DATE_FORMAT);
-            }
+            return tryParseDate(this.getDate());
         }
         return null;
     }
@@ -316,8 +326,8 @@ public final class RequestContent implements Serializable {
      * @return a {@link Calendar} in the specified time zone or in the default time zone if the timeZone parameter is null
      */
     public Calendar getDateTZ(TimeZone timeZone) {
-        Date dateGMT = this.getDateGMT();
         TimeZone tz = timeZone != null ? timeZone : TimeZone.getDefault();
+        Date dateGMT = this.getDateGMT();
         if (dateGMT != null) {
             Calendar calGMT = new GregorianCalendar(getGMT());
             calGMT.setTime(dateGMT);

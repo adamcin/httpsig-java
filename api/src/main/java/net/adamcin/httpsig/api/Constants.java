@@ -80,7 +80,7 @@ public final class Constants {
     /**
      * List of headers to always exclude from signature calculation
      */
-    public static final List<String> IGNORE_HEADERS = Arrays.asList("authorization", HEADER_REQUEST_LINE);
+    public static final List<String> IGNORE_HEADERS = Arrays.asList("authorization");
 
     /**
      * Http request header representing client credentials
