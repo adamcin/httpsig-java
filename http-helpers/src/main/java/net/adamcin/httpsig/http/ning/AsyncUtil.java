@@ -164,7 +164,7 @@ public final class AsyncUtil {
         return response;
     }
 
-    public static String getRequestPath(Request request) {
+    protected static String getRequestPath(Request request) {
         try {
             URL url = new URL(request.getUrl());
             return url.getPath() + (url.getQuery() != null ? "?" + url.getQuery() : "");

@@ -123,21 +123,17 @@ public final class Constants {
         if (tokens == null || tokens.trim().isEmpty()) {
             return Collections.emptyList();
         } else {
-            List<String> tokenList = new ArrayList<String>();
-            String[] _tokens = tokens.trim().split("\\s+");
-            for (String _token : _tokens) {
-                tokenList.add(_token);
-            }
-            return Collections.unmodifiableList(tokenList);
+            return Collections.unmodifiableList(Arrays.asList(tokens.trim().split("\\s+")));
         }
     }
 
     public static String constructTokensString(List<String> tokens) {
         StringBuilder sb = new StringBuilder();
-        if (tokens != null) {
+        if (tokens != null && !tokens.isEmpty()) {
             for (String token : tokens) {
                 sb.append(token).append(" ");
             }
+            sb.deleteCharAt(sb.length() - 1);
         }
         return sb.toString();
     }
@@ -154,10 +150,10 @@ public final class Constants {
     }
 
     public static String constructRFC2617(Map<String, String> params) {
-        StringBuilder sb = new StringBuilder(SCHEME);
+        StringBuilder sb = new StringBuilder(SCHEME + ' ');
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, String> param : params.entrySet()) {
-                sb.append(" ").append(param.getKey()).append("=\"").append(param.getValue()).append("\"").append(",");
+                sb.append(param.getKey()).append("=\"").append(param.getValue()).append("\"").append(",");
             }
             sb.deleteCharAt(sb.length() - 1);
         }
