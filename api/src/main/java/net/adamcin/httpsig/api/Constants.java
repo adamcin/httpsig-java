@@ -65,7 +65,13 @@ public final class Constants {
      */
     public static final String KEY_ID = "keyId";
 
+    /**
+     * replaced with {@code request-target} in draft-cavage-http-signatures-03
+     */
+    @Deprecated
     public static final String HEADER_REQUEST_LINE = "request-line";
+
+    public static final String HEADER_REQUEST_TARGET = "(request-target)";
 
     public static final String HEADER_DATE = "date";
 
@@ -74,7 +80,7 @@ public final class Constants {
     /**
      * List of headers to always exclude from signature calculation
      */
-    public static final List<String> IGNORE_HEADERS = Arrays.asList("authorization");
+    public static final List<String> IGNORE_HEADERS = Arrays.asList("authorization", HEADER_REQUEST_LINE);
 
     /**
      * Http request header representing client credentials

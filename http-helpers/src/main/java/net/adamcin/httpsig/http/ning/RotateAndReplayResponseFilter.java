@@ -85,7 +85,7 @@ public class RotateAndReplayResponseFilter implements ResponseFilter {
                 }
 
                 RequestBuilder builder = new RequestBuilder(request);
-                AsyncUtil.calculateSignature(signer, request, builder, AsyncUtil.REQUEST_LINE_FORMAT);
+                AsyncUtil.calculateSignature(signer, request, builder);
 
                 return new FilterContext.FilterContextBuilder(ctx)
                         .replayRequest(replay)

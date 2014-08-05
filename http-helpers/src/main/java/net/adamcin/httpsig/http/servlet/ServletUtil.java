@@ -93,12 +93,7 @@ public final class ServletUtil {
         RequestContent.Builder signatureContent = new RequestContent.Builder();
         String path = request.getRequestURI() + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
 
-        signatureContent.setRequestLine(
-                String.format(
-                        "%s %s %s",
-                        request.getMethod(), path, request.getProtocol()
-                )
-        );
+        signatureContent.setRequestTarget(request.getMethod(), path);
 
         Enumeration headerNames = request.getHeaderNames();
 

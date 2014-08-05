@@ -53,21 +53,38 @@ public final class RequestContent implements Serializable {
 
     private static final long serialVersionUID = -2968642080214687631L;
 
+    @Deprecated
     private final String requestLine;
+    private final String method;
+    private final String path;
     private final Map<String, List<String>> headers;
 
-    private RequestContent(final String requestLine, final Map<String, List<String>> headers) {
+    private RequestContent(final String requestLine, final String method, final String path, final Map<String, List<String>> headers) {
         this.requestLine = requestLine;
+        this.method = method;
+        this.path = path;
         this.headers = headers;
     }
 
     public static final class Builder {
 
+        @Deprecated
         private String requestLine = null;
+
+        private String method = null;
+        private String path = null;
         private final Map<String, List<String>> headers = new LinkedHashMap<String, List<String>>();
 
+        @Deprecated
         public Builder setRequestLine(String requestLine) {
+            LOGGER.warning("[setRequestLine] Use of the request-line header is deprecated. Please use (request-target) instead.");
             this.requestLine = requestLine;
+            return this;
+        }
+
+        public Builder setRequestTarget(String method, String path) {
+            this.method = method.toUpperCase();
+            this.path = path;
             return this;
         }
 
@@ -83,7 +100,7 @@ public final class RequestContent implements Serializable {
             if (Constants.IGNORE_HEADERS.contains(_name) || _name.startsWith(":")) {
                 /* skip ignored headers and names which begin with a colon */
                 return this;
-            } else if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
+            } else if (Constants.HEADER_REQUEST_TARGET.equals(_name)) {
                 return this;
             } else if (!Constants.HEADER_DATE.equals(_name) || tryParseDate(value)) {
                 List<String> values = null;
@@ -148,7 +165,7 @@ public final class RequestContent implements Serializable {
         }
 
         public RequestContent build() {
-            return new RequestContent(requestLine, Collections.unmodifiableMap(headers));
+            return new RequestContent(requestLine, method, path, Collections.unmodifiableMap(headers));
         }
     }
 
@@ -174,9 +191,9 @@ public final class RequestContent implements Serializable {
             for (String header : headers) {
                 String _header = header.toLowerCase();
                 if (!Constants.IGNORE_HEADERS.contains(_header) && !_header.startsWith(":")) {
-                    if (Constants.HEADER_REQUEST_LINE.equals(_header)) {
-                        if (this.requestLine != null) {
-                            hashBuilder.append(this.requestLine).append("\n");
+                    if (Constants.HEADER_REQUEST_TARGET.equals(_header)) {
+                        if (this.getRequestTarget() != null) {
+                            hashBuilder.append(this.getRequestTarget()).append("\n");
                         }
                     } else {
                         for (String value : this.getHeaderValues(_header)) {
@@ -196,12 +213,12 @@ public final class RequestContent implements Serializable {
 
     /**
      * @return the list of header names contained in this {@link RequestContent}, in the order in which they were added, except
-     *         for request-line, which is listed first if present
+     *         for request-target, which is listed first if present
      */
     public List<String> getHeaderNames() {
         List<String> headerNames = new ArrayList<String>();
-        if (requestLine != null) {
-            headerNames.add(Constants.HEADER_REQUEST_LINE);
+        if (method != null && path != null) {
+            headerNames.add(Constants.HEADER_REQUEST_TARGET);
         }
         headerNames.addAll(this.headers.keySet());
         return Collections.unmodifiableList(headerNames);
@@ -211,8 +228,20 @@ public final class RequestContent implements Serializable {
     /**
      * @return the request-line if set
      */
+    @Deprecated
     public String getRequestLine() {
         return requestLine;
+    }
+
+    /**
+     * @return the request-target if set
+     */
+    public String getRequestTarget() {
+        if (method == null || path == null) {
+            return null;
+        } else {
+            return method.toLowerCase() + " " + path;
+        }
     }
 
     /**
@@ -229,9 +258,9 @@ public final class RequestContent implements Serializable {
      */
     public List<String> getHeaderValues(String name) {
         String _name = name.toLowerCase();
-        if (Constants.HEADER_REQUEST_LINE.equals(_name)) {
-            return this.requestLine != null ? Collections.singletonList(
-                    this.requestLine
+        if (Constants.HEADER_REQUEST_TARGET.equals(_name)) {
+            return this.getRequestTarget() != null ? Collections.singletonList(
+                    this.getRequestTarget()
             ) : Collections.<String>emptyList();
         } else if (this.headers.containsKey(_name)) {
             return Collections.unmodifiableList(this.headers.get(_name));
