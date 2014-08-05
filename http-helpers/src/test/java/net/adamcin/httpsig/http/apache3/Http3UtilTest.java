@@ -58,7 +58,7 @@ public class Http3UtilTest {
 
             @Override protected void execute() throws Exception {
                 List<String> headers = Arrays.asList(
-                        Constants.HEADER_REQUEST_LINE,
+                        Constants.HEADER_REQUEST_TARGET,
                         Constants.HEADER_DATE);
                 setServlet(new AdminServlet(headers));
 
@@ -86,7 +86,7 @@ public class Http3UtilTest {
         TestBody.test(new HttpServerTestBody() {
             @Override protected void execute() throws Exception {
                 List<String> headers = Arrays.asList(
-                        Constants.HEADER_REQUEST_LINE,
+                        Constants.HEADER_REQUEST_TARGET,
                         Constants.HEADER_DATE,
                         "x-test"
                 );

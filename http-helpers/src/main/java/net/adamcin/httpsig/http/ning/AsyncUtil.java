@@ -47,8 +47,6 @@ import java.util.concurrent.Future;
 
 public final class AsyncUtil {
 
-    static final String REQUEST_LINE_FORMAT = "%s %s HTTP/1.1";
-
     /**
      * Attaches the provided {@link Signer} to the {@link AsyncHttpClient} as a signature calculator.
      * It is expected that key rotation and {@link net.adamcin.httpsig.api.Challenge} management is outside the scope
@@ -166,22 +164,21 @@ public final class AsyncUtil {
         return response;
     }
 
-    public static String getRequestLine(Request request, String requestLineFormat) {
-        String path = "";
+    public static String getRequestPath(Request request) {
         try {
             URL url = new URL(request.getUrl());
-            path = url.getPath() + (url.getQuery() != null ? "?" + url.getQuery() : "");
+            return url.getPath() + (url.getQuery() != null ? "?" + url.getQuery() : "");
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
 
-        return String.format(requestLineFormat != null ? requestLineFormat : REQUEST_LINE_FORMAT, request.getMethod(), path);
+        return null;
     }
 
-    public static void calculateSignature(Signer signer, Request request, RequestBuilderBase<?> requestBuilder, String requestLineFormat) {
+    public static void calculateSignature(Signer signer, Request request, RequestBuilderBase<?> requestBuilder) {
         RequestContent.Builder sigBuilder = new RequestContent.Builder();
 
-        sigBuilder.setRequestLine(getRequestLine(request, requestLineFormat));
+        sigBuilder.setRequestTarget(request.getMethod(), getRequestPath(request));
         for (FluentCaseInsensitiveStringsMap.Entry<String, List<String>> entry : request.getHeaders().entrySet()) {
             for (String value : entry.getValue()) {
                 sigBuilder.addHeader(entry.getKey(), value);

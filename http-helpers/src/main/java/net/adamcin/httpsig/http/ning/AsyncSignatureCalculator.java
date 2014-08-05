@@ -57,6 +57,6 @@ public class AsyncSignatureCalculator implements SignatureCalculator {
      */
     public void calculateAndAddSignature(String url, Request request, RequestBuilderBase<?> requestBuilder) {
         delegatee.calculateAndAddSignature(url, request, requestBuilder);
-        AsyncUtil.calculateSignature(this.signer, request, requestBuilder, AsyncUtil.REQUEST_LINE_FORMAT);
+        AsyncUtil.calculateSignature(this.signer, request, requestBuilder);
     }
 }

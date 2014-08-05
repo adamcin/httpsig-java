@@ -83,7 +83,8 @@ public final class Http4SignatureAuthScheme extends RFC2617Scheme {
             }
 
             RequestContent.Builder sigBuilder = new RequestContent.Builder();
-            sigBuilder.setRequestLine(request.getRequestLine().toString());
+            sigBuilder.setRequestTarget(request.getRequestLine().getMethod(),
+                    request.getRequestLine().getUri());
 
             for (Header header : request.getAllHeaders()) {
                 if (header.getName().toLowerCase().equals("connection")) {
