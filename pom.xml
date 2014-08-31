@@ -180,7 +180,16 @@
                 <plugin>
                     <groupId>com.github.github</groupId>
                     <artifactId>site-maven-plugin</artifactId>
-                    <version>0.9</version>
+                    <version>0.10-SNAPSHOT</version>
+                    <executions>
+                        <execution>
+                            <id>github-site-deploy</id>
+                            <goals>
+                                <goal>site</goal>
+                            </goals>
+                            <phase>site</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -206,6 +215,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -225,14 +237,6 @@
                     <repositoryOwner>adamcin</repositoryOwner>
                     <repositoryName>httpsig-java</repositoryName>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>site</goal>
-                        </goals>
-                        <phase>site</phase>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
