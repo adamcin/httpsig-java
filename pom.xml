@@ -87,8 +87,8 @@
             <name>Mark Adamcin</name>
             <email>adamcin@gmail.com</email>
             <url>http://adamcin.net</url>
-            <organization>Acquity Group</organization>
-            <organizationUrl>http://www.acquitygroup.com</organizationUrl>
+            <organization>Mashery</organization>
+            <organizationUrl>http://www.mashery.com</organizationUrl>
             <roles>
                 <role>architect</role>
                 <role>developer</role>
@@ -257,34 +257,34 @@
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-api</artifactId>
-                <version>${project.version}</version>
+                <version>1.0.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-test-common</artifactId>
-                <version>${project.version}</version>
+                <version>1.0.7-SNAPSHOT</version>
 				<scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-ssh-jce</artifactId>
-                <version>${project.version}</version>
+                <version>1.0.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-ssh-bc</artifactId>
-                <version>${project.version}</version>
+                <version>1.0.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-ssh-jsch</artifactId>
-                <version>${project.version}</version>
+                <version>1.0.7-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-http-helpers</artifactId>
-                <version>${project.version}</version>
+                <version>1.0.7-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
