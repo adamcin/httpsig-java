@@ -36,6 +36,8 @@ Overview
 
 * **httpsig-ssh-jsch**: Alternative implementation of SSH key support using the JSch API.
 
+* **httpsig-hmac**: Provides a HMAC implementation with support for SHA-256 and SHA-512.
+
 * **httpsig-test-common**: Provides several public/private SSH key pairs and utility methods for writing unit tests.
 
 API
