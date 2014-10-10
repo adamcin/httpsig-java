@@ -39,7 +39,6 @@ import net.adamcin.httpsig.http.servlet.ServletUtil;
 import net.adamcin.httpsig.ssh.jce.AuthorizedKeys;
 import net.adamcin.httpsig.testutil.KeyTestUtil;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
@@ -82,7 +81,7 @@ public abstract class HttpServerTestBody extends TestBody {
 
     protected Integer getPort() {
         if (server.getConnectors().length > 0) {
-            return ((ServerConnector) server.getConnectors()[0]).getLocalPort();
+            return server.getConnectors()[0].getLocalPort();
         } else {
             return null;
         }

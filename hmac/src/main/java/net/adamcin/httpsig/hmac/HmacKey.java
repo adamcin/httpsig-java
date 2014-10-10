@@ -38,7 +38,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 public class HmacKey implements Key {
@@ -55,8 +54,14 @@ public class HmacKey implements Key {
      * @param secret The secret used to sign
      */
     public HmacKey(String keyId, String secret) {
-        this.keyId = Objects.requireNonNull(keyId, "keyId must not be null");
-        this.secret = Objects.requireNonNull(secret, "secret must not be null");
+        if (keyId == null) {
+            throw new NullPointerException("keyId must not be null");
+        }
+        if (secret == null) {
+            throw new NullPointerException("secret must not be null");
+        }
+        this.keyId = keyId;
+        this.secret = secret;
     }
 
     /**
