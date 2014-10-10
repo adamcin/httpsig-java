@@ -292,6 +292,12 @@
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
+                <artifactId>httpsig-hmac</artifactId>
+                <version>1.2.1-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-http-helpers</artifactId>
                 <version>1.2.1-SNAPSHOT</version>
                 <scope>provided</scope>

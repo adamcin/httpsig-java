@@ -74,6 +74,7 @@
                             net.adamcin.httpsig.api,
                             net.adamcin.httpsig.ssh.jce,
                             net.adamcin.httpsig.ssh.bc,
+                            net.adamcin.httpsig.hmac,
                             net.adamcin.httpsig.http.*
                         </Export-Package>
                         <Import-Package>
@@ -87,6 +88,7 @@
                             httpsig-api;inline=true,
                             httpsig-ssh-jce;inline=true,
                             httpsig-ssh-bc;inline=true,
+                            httpsig-hmac;inline=true,
                             httpsig-http-helpers;inline=true,
                             bcpkix-jdk15on,
                             bcprov-jdk15on
@@ -107,7 +109,7 @@
                     <repositoryOwner>adamcin</repositoryOwner>
                     <repositoryName>httpsig-java</repositoryName>
                     <path>${project.artifactId}</path>
-					<merge>true</merge>
+                    <merge>true</merge>
                 </configuration>
             </plugin>
         </plugins>
@@ -155,6 +157,10 @@
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
             <artifactId>httpsig-ssh-bc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.adamcin.httpsig</groupId>
+            <artifactId>httpsig-hmac</artifactId>
         </dependency>
         <dependency>
             <groupId>net.adamcin.httpsig</groupId>
