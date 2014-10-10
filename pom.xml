@@ -37,7 +37,7 @@
 
     <groupId>net.adamcin.httpsig</groupId>
     <artifactId>httpsig</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2013</inceptionYear>
@@ -49,7 +49,7 @@
         <url>https://github.com/adamcin/httpsig-java</url>
         <developerConnection>scm:git:git@github.com:adamcin/httpsig-java.git</developerConnection>
         <connection>scm:git://github.com/adamcin/httpsig-java.git</connection>
-      <tag>HEAD</tag>
+      <tag>httpsig-1.2.0</tag>
   </scm>
 
     <modules>
@@ -266,34 +266,34 @@
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-api</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-test-common</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.2.0</version>
 				<scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-ssh-jce</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-ssh-bc</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-ssh-jsch</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.2.0</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>net.adamcin.httpsig</groupId>
                 <artifactId>httpsig-http-helpers</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.2.0</version>
                 <scope>provided</scope>
             </dependency>
 
