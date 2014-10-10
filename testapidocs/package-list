@@ -1,4 +1,5 @@
 net.adamcin.httpsig.api
+net.adamcin.httpsig.hmac
 net.adamcin.httpsig.http
 net.adamcin.httpsig.http.apache3
 net.adamcin.httpsig.http.apache4
