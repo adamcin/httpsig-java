@@ -92,9 +92,9 @@ public final class RequestContent implements Serializable {
         /**
          * Adds a header name and value pair
          *
-         * @param name
-         * @param value
-         * @return
+         * @param name header name
+         * @param value header value
+         * @return the Builder in fluent fashion
          */
         public Builder addHeader(final String name, final String value) {
             if (value != null) {
@@ -179,6 +179,7 @@ public final class RequestContent implements Serializable {
      * Returns the signature content as a byte array
      *
      * @param headers the list of headers to be included in the signed content
+     * @param charset charset for decoding the content
      * @return the result of {@link #getContentString(java.util.List)} encoded using the provided {@link Charset}
      */
     public byte[] getContent(List<String> headers, Charset charset) {
@@ -189,7 +190,7 @@ public final class RequestContent implements Serializable {
      * Returns the signature content as a String
      *
      * @param headers the list of headers to be included in the signed content
-     * @return
+     * @return formatted content to be signed
      */
     public String getContentString(List<String> headers) {
         StringBuilder hashBuilder = new StringBuilder();

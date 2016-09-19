@@ -79,7 +79,7 @@ public final class ServletUtil {
      * Parse an {@link javax.servlet.http.HttpServletRequest} to build the {@link net.adamcin.httpsig.api.RequestContent}
      * @param request the HTTP Request
      * @param ignoreHeaders a collection of header names to ignore, in case they have been added by proxies
-     * @return
+     * @return the signable request content
      */
     public static RequestContent getRequestContent(HttpServletRequest request, Collection<String> ignoreHeaders) {
         final Set<String> _ignore = new HashSet<String>();

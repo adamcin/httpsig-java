@@ -83,6 +83,7 @@ public final class AuthorizedKeys {
      * @param authorizedKeysFile File in the RFC4253 authorized_keys format that every Linux admin knows and loves,
      *                           which contains a list of public keys which are allowed for authentication
      * @return a {@link Keychain} attached to the authorized_keys identities
+     * @throws IOException for any failure to parse designated file
      */
     public static Keychain newKeychain(File authorizedKeysFile) throws IOException {
         DefaultKeychain identities = new DefaultKeychain();

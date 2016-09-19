@@ -144,7 +144,7 @@ public class DefaultKeychain implements Keychain, Collection<Key> {
 
     /**
      *
-     * @return
+     * @return the current key
      * @throws NoSuchElementException if the keychain is empty
      */
     public Key currentKey() {

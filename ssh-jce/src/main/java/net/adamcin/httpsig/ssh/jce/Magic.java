@@ -43,7 +43,7 @@ public final class Magic {
      * Computes the MD5 fingerprint of the public key blob
      *
      * @param keyBlob base64-decoded byte array containing the public key spec
-     * @return
+     * @return MD5 fingerprint as a string
      * @see <a href="http://tools.ietf.org/html/rfc4716#section-4">[RFC4716] Section 4: Public Key Fingerprints</a>
      */
     public static String getFingerprint(byte[] keyBlob) {
@@ -92,8 +92,8 @@ public final class Magic {
 
     /**
      * Pad {@code r} and {@code s} to 160-bit (20 byte) integers
-     * @param signatureBytes
-     * @return
+     * @param signatureBytes data for unpadded signature
+     * @return padded signature data
      */
     public static byte[] dssPadSignature(byte[] signatureBytes) {
         // sig is in ASN.1
@@ -129,8 +129,8 @@ public final class Magic {
 
     /**
      * Remove padding from 160-bit integers, {@code r} and {@code s}
-     * @param signatureBytes
-     * @return
+     * @param signatureBytes data for padded signature
+     * @return unpadded signature data
      */
     public static byte[] dssUnpadSignature(byte[] signatureBytes) {
         // ASN.1

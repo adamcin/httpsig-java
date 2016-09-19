@@ -55,10 +55,10 @@ public class PEMUtil {
 
     /**
      * Read a single PEM-formatted key
-     * @param is
-     * @param passphrase
-     * @return
-     * @throws IOException
+     * @param is input stream
+     * @param passphrase passphrase protecting stream
+     * @return the key if successful, null if not
+     * @throws IOException if not successful because I/O
      */
     public static Key readKey(InputStream is, final char[] passphrase) throws IOException {
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
@@ -99,10 +99,10 @@ public class PEMUtil {
     /**
      *
      * Read a single PEM-formatted key
-     * @param privateKeyFile
-     * @param passphrase
-     * @return
-     * @throws IOException
+     * @param privateKeyFile private key file
+     * @param passphrase passphrase for protected file
+     * @return key if successful
+     * @throws IOException if not successful
      */
     public static Key readKey(File privateKeyFile, final char[] passphrase) throws IOException {
         InputStream is = null;
@@ -120,10 +120,10 @@ public class PEMUtil {
     /**
      *
      * Read a single PEM-formatted key
-     * @param keyBytes
-     * @param passphrase
-     * @return
-     * @throws IOException
+     * @param keyBytes data for key
+     * @param passphrase passphrase
+     * @return key if successful
+     * @throws IOException if not successful
      */
     public static Key readKey(byte[] keyBytes, final char[] passphrase) throws IOException {
         ByteArrayInputStream is = null;
