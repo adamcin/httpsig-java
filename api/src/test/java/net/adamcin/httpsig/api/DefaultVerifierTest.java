@@ -31,7 +31,10 @@ package net.adamcin.httpsig.api;
 import net.adamcin.commons.testing.junit.TestBody;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -52,6 +55,35 @@ public class DefaultVerifierTest {
                 Authorization a = new Authorization(fingerprint, MockKey.mockSignBase64(content), Constants.DEFAULT_HEADERS, Algorithm.SSH_RSA);
 
                 assertTrue("default verifier should verify mock signature ", v.verify(c, requestContent, a));
+            }
+        });
+    }
+
+
+    @Test
+    public void testStrictVerify() {
+        TestBody.test(new TestBody() {
+            @Override protected void execute() throws Exception {
+                String fingerprint = "fingerprint";
+
+                Keychain identities = new MockKeychain(fingerprint);
+                DefaultVerifier v = new DefaultVerifier(identities);
+                DefaultVerifier strictV = new DefaultVerifier(identities, true);
+                RequestContent requestContent = new RequestContent.Builder().setRequestTarget("get", "index.html").addDateNow().build();
+                List<String> headers = Arrays.asList(Constants.HEADER_REQUEST_TARGET, Constants.HEADER_DATE);
+                Challenge c = new Challenge(DefaultVerifierTest.class.getName(),
+                        headers,
+                        Arrays.asList( Algorithm.SSH_RSA ));
+
+                byte[] content = requestContent.getContent(headers, Constants.CHARSET);
+                byte[] strictContent = requestContent.getBytesToSign(headers, Constants.CHARSET);
+                Authorization authz = new Authorization(fingerprint, MockKey.mockSignBase64(content), headers, Algorithm.SSH_RSA);
+                Authorization strictAuthz = new Authorization(fingerprint, MockKey.mockSignBase64(strictContent), headers, Algorithm.SSH_RSA);
+
+                assertTrue("default verifier should verify default mock signature ", v.verify(c, requestContent, authz));
+                assertTrue("default verifier should verify strict mock signature ", v.verify(c, requestContent, strictAuthz));
+                assertTrue("strict verifier should verify strict mock signature ", strictV.verify(c, requestContent, strictAuthz));
+                assertFalse("strict verifier should not verify default mock signature ", strictV.verify(c, requestContent, authz));
             }
         });
     }
