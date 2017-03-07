@@ -163,7 +163,7 @@ public final class Signer {
 
             List<String> headers = new ArrayList<String>(signHeaders);
 
-            byte[] signature = key.sign(algo, requestContent.getContent(headers, Constants.CHARSET));
+            byte[] signature = key.sign(algo, requestContent.getBytesToSign(headers, Constants.CHARSET));
 
             if (signature != null) {
                 return new Authorization(this.keyId.getId(key), Base64.toBase64String(signature), headers, algo);

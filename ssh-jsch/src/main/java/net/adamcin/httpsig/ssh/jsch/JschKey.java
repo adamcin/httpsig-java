@@ -79,7 +79,7 @@ public class JschKey implements FingerprintableKey {
     /**
      * {@inheritDoc}
      * @param algorithm the selected Signature {@link Algorithm}
-     * @param challengeHash the result of {@link net.adamcin.httpsig.api.RequestContent#getContent(java.util.List, java.nio.charset.Charset)}
+     * @param challengeHash the result of {@link net.adamcin.httpsig.api.RequestContent#getBytesToSign(java.util.List, java.nio.charset.Charset)}
      * @param signatureBytes the result of {@link net.adamcin.httpsig.api.Authorization#getSignatureBytes()}
      * @return true if verified
      */
@@ -147,7 +147,7 @@ public class JschKey implements FingerprintableKey {
     /**
      * {@inheritDoc}
      * @param algorithm the selected Signature {@link Algorithm}
-     * @param challengeHash the result of {@link net.adamcin.httpsig.api.RequestContent#getContent(java.util.List, java.nio.charset.Charset)}
+     * @param challengeHash the result of {@link net.adamcin.httpsig.api.RequestContent#getBytesToSign(java.util.List, java.nio.charset.Charset)}
      * @return the generated signature
      */
     public byte[] sign(Algorithm algorithm, byte[] challengeHash) {

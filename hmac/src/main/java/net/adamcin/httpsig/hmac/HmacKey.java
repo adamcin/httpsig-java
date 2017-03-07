@@ -94,7 +94,7 @@ public class HmacKey implements Key {
     /**
      * Verifies the {@code signatureBytes} against the {@code challengeHash} using an underlying public key
      * @param algorithm the selected Signature {@link net.adamcin.httpsig.api.Algorithm}
-     * @param contentBytes the result of {@link net.adamcin.httpsig.api.RequestContent#getContent(java.util.List, java.nio.charset.Charset)}
+     * @param contentBytes the result of {@link net.adamcin.httpsig.api.RequestContent#getBytesToSign(java.util.List, java.nio.charset.Charset)}
      * @param signatureBytes the result of {@link net.adamcin.httpsig.api.Authorization#getSignatureBytes()}
      * @return true if signature is valid
      */
@@ -133,7 +133,7 @@ public class HmacKey implements Key {
     /**
      * Signs the {@code challengeHash} using the specified signature {@link net.adamcin.httpsig.api.Algorithm}
      * @param algorithm the selected Signature {@link net.adamcin.httpsig.api.Algorithm}
-     * @param contentBytes the result of {@link net.adamcin.httpsig.api.RequestContent#getContent(java.util.List, java.nio.charset.Charset)}
+     * @param contentBytes the result of {@link net.adamcin.httpsig.api.RequestContent#getBytesToSign(java.util.List, java.nio.charset.Charset)}
      * @return byte array containing the challengeHash signature or null if a signature could not be generated.
      */
     public byte[] sign(Algorithm algorithm, byte[] contentBytes) {

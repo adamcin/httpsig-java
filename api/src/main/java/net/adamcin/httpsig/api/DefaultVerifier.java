@@ -45,18 +45,32 @@ public final class DefaultVerifier implements Verifier {
     private final KeyId keyId;
     private final long skew;
 
+    // this parameter is not long for the world. Do not expose to API.
+    private final boolean strictRequestTarget;
+
     public DefaultVerifier(Keychain keychain) {
-        this(keychain, null, DEFAULT_SKEW);
+        this(keychain, null, DEFAULT_SKEW, false);
+    }
+
+    // Package-private constructor to prevent external API usage of strictRequestTarget parameter.
+    DefaultVerifier(Keychain keychain, boolean strictRequestTarget) {
+        this(keychain, null, DEFAULT_SKEW, strictRequestTarget);
     }
 
     public DefaultVerifier(Keychain keychain, KeyId keyId) {
-        this(keychain, keyId, DEFAULT_SKEW);
+        this(keychain, keyId, DEFAULT_SKEW, false);
     }
 
     public DefaultVerifier(Keychain keychain, KeyId keyId, long skew) {
+        this(keychain, keyId, skew, false);
+    }
+
+    // private constructor to prevent external API usage of strictRequestTarget parameter.
+    private DefaultVerifier(Keychain keychain, KeyId keyId, long skew, boolean strictRequestTarget) {
         this.keychain = keychain != null ? new KeychainGuard(keychain) : new KeychainGuard(new DefaultKeychain());
         this.keyId = new CanVerifyId(keyId != null ? keyId : Constants.DEFAULT_KEY_IDENTIFIER);
         this.skew = skew;
+        this.strictRequestTarget = strictRequestTarget;
     }
 
     public Keychain getKeychain() {
@@ -139,9 +153,18 @@ public final class DefaultVerifier implements Verifier {
         }
 
         if (key.verify(authorization.getAlgorithm(),
-                                      requestContent.getContent(authorization.getHeaders(), Constants.CHARSET),
+                                      requestContent.getBytesToSign(authorization.getHeaders(), Constants.CHARSET),
                                       authorization.getSignatureBytes())) {
             return VerifyResult.SUCCESS;
+        } else if (!this.strictRequestTarget
+                && authorization.getHeaders().contains(Constants.HEADER_REQUEST_TARGET)) {
+            if (key.verify(authorization.getAlgorithm(),
+                    requestContent.getContent(authorization.getHeaders(),
+                    Constants.CHARSET), authorization.getSignatureBytes())) {
+                return VerifyResult.SUCCESS;
+            } else {
+                return VerifyResult.FAILED_KEY_VERIFY;
+            }
         } else {
             return VerifyResult.FAILED_KEY_VERIFY;
         }

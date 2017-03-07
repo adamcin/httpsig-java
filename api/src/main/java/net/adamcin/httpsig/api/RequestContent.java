@@ -53,7 +53,7 @@ public final class RequestContent implements Serializable {
 
     private static final List<String> SUPPORTED_DATE_FORMATS = Arrays.asList(DATE_FORMAT_RFC1123, DATE_FORMAT);
 
-    private static final long serialVersionUID = -2968642080214687631L;
+    private static final long serialVersionUID = -2968642080214687632L;
 
     @Deprecated
     private final String requestLine;
@@ -181,7 +181,10 @@ public final class RequestContent implements Serializable {
      * @param headers the list of headers to be included in the signed content
      * @param charset charset for decoding the content
      * @return the result of {@link #getContentString(java.util.List)} encoded using the provided {@link Charset}
+     * @deprecated use {@link #getBytesToSign(List, Charset)} to include the {@link Constants#HEADER_REQUEST_TARGET}
+     *              prefix in signature content
      */
+    @Deprecated
     public byte[] getContent(List<String> headers, Charset charset) {
         return getContentString(headers).getBytes(charset);
     }
@@ -191,8 +194,42 @@ public final class RequestContent implements Serializable {
      *
      * @param headers the list of headers to be included in the signed content
      * @return formatted content to be signed
+     * @deprecated use {@link #getStringToSign(List)} to include the {@link Constants#HEADER_REQUEST_TARGET}
+     *              prefix in signature content
      */
+    @Deprecated
     public String getContentString(List<String> headers) {
+        return getStringToSign(headers, true);
+    }
+
+    /**
+     * Returns the request content as a String for generating a signature.
+     *
+     * @param headers the list of headers to be included in the signed content
+     * @return formatted content to be signed
+     */
+    public String getStringToSign(List<String> headers) {
+        return getStringToSign(headers, false);
+    }
+
+    /**
+     * Returns the request content as a byte array for generating a signature.
+     *
+     * @param headers the list of headers to be included in the signed content
+     * @param charset charset for decoding the content
+     * @return the result of {@link #getStringToSign(List)} encoded using the provided {@link Charset}
+     */
+    public byte[] getBytesToSign(List<String> headers, Charset charset) {
+        return getStringToSign(headers).getBytes(charset);
+    }
+
+    /**
+     * Method created for backwards compatibility.
+     * @param headers the list of headers to be included in the signed content.
+     * @param suppressRequestTargetPrefix true to remove "(request-target): " from the content.
+     * @return formatted content String to be signed.
+     */
+    private String getStringToSign(List<String> headers, boolean suppressRequestTargetPrefix) {
         StringBuilder hashBuilder = new StringBuilder();
         if (headers != null) {
             for (String header : headers) {
@@ -204,6 +241,9 @@ public final class RequestContent implements Serializable {
                         }
                     } else if (Constants.HEADER_REQUEST_TARGET.equals(_header)) {
                         if (this.getRequestTarget() != null) {
+                            if (!suppressRequestTargetPrefix) {
+                                hashBuilder.append(Constants.HEADER_REQUEST_TARGET).append(": ");
+                            }
                             hashBuilder.append(this.getRequestTarget()).append('\n');
                         }
                     } else {
@@ -219,7 +259,7 @@ public final class RequestContent implements Serializable {
 
     @Override
     public String toString() {
-        return getContentString(this.getHeaderNames());
+        return getStringToSign(this.getHeaderNames());
     }
 
     /**
