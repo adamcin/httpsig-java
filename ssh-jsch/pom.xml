@@ -32,7 +32,7 @@
 	<parent>
         <groupId>net.adamcin.httpsig</groupId>
         <artifactId>httpsig</artifactId>
-        <version>1.2.2-SNAPSHOT</version>
+        <version>1.3.0</version>
 		<relativePath>..</relativePath>
     </parent>
 
@@ -50,7 +50,7 @@
         <url>https://github.com/adamcin/httpsig-java</url>
         <developerConnection>scm:git:git@github.com:adamcin/httpsig-java.git</developerConnection>
         <connection>scm:git://github.com/adamcin/httpsig-java.git</connection>
-      <tag>HEAD</tag>
+      <tag>httpsig-1.3.0</tag>
   </scm>
 
     <build>
