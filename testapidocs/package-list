@@ -1,10 +1,1 @@
-net.adamcin.httpsig.api
-net.adamcin.httpsig.hmac
-net.adamcin.httpsig.http
-net.adamcin.httpsig.http.apache3
-net.adamcin.httpsig.http.apache4
-net.adamcin.httpsig.http.ning
-net.adamcin.httpsig.ssh.bc
-net.adamcin.httpsig.ssh.jce
-net.adamcin.httpsig.ssh.jsch
-net.adamcin.httpsig.testutil
+net.adamcin.oakpal.core
