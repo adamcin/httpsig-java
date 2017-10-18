@@ -134,7 +134,7 @@ public final class RequestContent implements Serializable {
          */
         public Builder addDate(Calendar calendar) {
             if (calendar != null) {
-                DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC1123);
+                DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC1123, Locale.US);
                 dateFormat.setTimeZone(calendar.getTimeZone());
                 this.addHeader(Constants.HEADER_DATE, dateFormat.format(calendar.getTime()));
             }
@@ -336,7 +336,7 @@ public final class RequestContent implements Serializable {
 
             for (String formatString : SUPPORTED_DATE_FORMATS) {
                 try {
-                    DateFormat dateFormat = new SimpleDateFormat(formatString);
+                    DateFormat dateFormat = new SimpleDateFormat(formatString, Locale.US);
                     dateFormat.setTimeZone(getGMT());
                     return dateFormat.parse(date);
                 } catch (ParseException e) {
