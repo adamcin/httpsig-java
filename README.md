@@ -110,7 +110,7 @@ To create a Verifier, you must provide a Keychain and a KeyId. For example:
 
     // The UserKeysFingerprintKeyId class is provided by httpsig-ssh-jce to
     //   construct keyIds using the Joyent API convention, "/${username}/keys/${fingerprint}"
-    Verifier verifier = new Verifier(keychain, new UserKeysFingerprintKeyId("admin"));
+    Verifier verifier = new DefaultVerifier(keychain, new UserKeysFingerprintKeyId("admin"));
 
 After parsing an Authorization and building the RequestContent object from the HTTP request, the server verifies the Authorization header using Verifier.verify()
 
